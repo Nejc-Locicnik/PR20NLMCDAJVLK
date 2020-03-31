@@ -1,4 +1,2 @@
-# PR20NLMCDAJVLK
-Projektna naloga, Podatkovno rudarjenje, 2020
+# Ce bi kdo kej testiral git funkcije lahko na tem branchu
 
-Avtorji: Nejc Ločičnik, Matic Cavalleri, Domen Antlej, Jure Vukina, Luka Kalezić
