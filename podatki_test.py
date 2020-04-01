@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib
+import pandas as pd
 import matplotlib.pyplot as plt
 from csv import DictReader
 
@@ -49,3 +50,30 @@ plt.show()
 
 print(vehicle_colors)
 print(vehicle_makes)
+print(vehicle_body_types)
+
+# GRAF ŠTEVILA KAZNI PO DATUMIH:
+
+# branje in parsanje datumov v format datetime: 
+dataset = pd.read_csv("podatki/Parking_Violations_Issued_-_Fiscal_Year_2014__August_2013___June_2014__small.csv", parse_dates=['Issue Date'])
+date_count = dataset.groupby(['Issue Date'])[['Issue Date']].agg('count')
+# dodajanje mankajočih datumov in jih fillat z ničlo:
+date_range = pd.date_range('03-01-2013', '09-01-2013')
+date_count = date_count.reindex(date_range, fill_value=0)
+# izris:
+plt.plot(date_count)
+plt.title("Število napisanih kazni 2013/2014", size=18)
+plt.xlabel('Datum')
+plt.xticks(rotation=90)
+plt.ylabel('Št. parkirnih kazni')
+plt.show()
+
+# GRAF KAZNI GLEDE NA DAN V TEDNU:
+
+weekday_count = dataset.groupby(dataset['Issue Date'].dt.dayofweek).agg('count')['Issue Date']
+# izris:
+plt.bar(np.array(['mon','tue','wed','thu','fri','sat','sun']), weekday_count)
+plt.title("Kazni glede na dan v tednu 2013/2014", size=18)
+plt.xlabel('Dan v tednu')
+plt.ylabel('Skupno št. parkirnih kazni')
+plt.show()
