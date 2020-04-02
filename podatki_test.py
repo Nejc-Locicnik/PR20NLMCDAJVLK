@@ -9,16 +9,24 @@ def beri_dataset(filename):
     return pd.read_csv(filename, parse_dates=['Issue Date'])
 
 
-def kazni_datum():
+def kazni_datum_group_teden():
     """ GRAF ŠTEVILA KAZNI PO DATUMIH: """
 
-    date_count = dataset.groupby(['Issue Date'])[['Issue Date']].agg('count')
-    # dodajanje mankajočih datumov in jih fillat z ničlo:
-    date_range = pd.date_range('07-01-2013', '06-1-2014')
-    date_count = date_count.reindex(date_range, fill_value=0)
+    date_count = dataset.groupby(dataset['Issue Date'])['Issue Date'].agg(['count'])
+    # Issue date postane nazaj column in ne index:
+    date_count = date_count.reset_index()
+    # vsem datumom odštejemo 7 dni ker jih bomo groupirali, tako da bo group veljal za 7 dni naprej in ne 7 dni nazaj:
+    date_count['Issue Date'] = pd.to_datetime(date_count['Issue Date']) - pd.to_timedelta(7, unit='d')
+    # grupiramo vsak teden in seštejemo število kazni v tistem tednu:
+    date_count = date_count.groupby([pd.Grouper(key='Issue Date', freq='W-MON')])['count'].sum().reset_index()
+    # filtriranje datumov, ki ne bi smeli obstajati:
+    date_count = date_count[ (date_count['Issue Date'] > '2013-07-25') & (date_count['Issue Date'] < '2014-06-20') ]
+    # "Issue Date" nazaj v index dataframa:
+    date_count = date_count.set_index('Issue Date')
     # izris:
     plt.rcParams.update({'figure.autolayout': True})
     plt.plot(date_count)
+    plt.ylim(bottom=0)
     plt.title("Število napisanih kazni 2013/2014")
     plt.xlabel('Datum')
     plt.xticks(rotation=90)
@@ -171,7 +179,7 @@ file_2017_small = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2017_small.cs
 
 dataset = beri_dataset(file_2014_small)
 
-kazni_datum()
+kazni_datum_group_teden()
 kazni_dan_v_tednu()
 kazni_proizvajalec_abs()
 kazni_proizvajalec_rel()  # pravilno delujoče zgolj za file_2013_2014
