@@ -42,11 +42,11 @@ for row in reader:
 
 
 plt.figure(figsize=(10, 5))
-# plt.bar(vehicle_body_types.keys(), vehicle_body_types.values(), align="center", width=0.5, alpha=0.7)
-# plt.suptitle("Parkirne kazni gleda na tip vozila", size=18)
-# plt.xlabel('Tip vozila')
-# plt.ylabel('Št. parkirnih kazni')
-# plt.show()
+plt.bar(vehicle_body_types.keys(), vehicle_body_types.values(), align="center", width=0.5, alpha=0.7)
+plt.title("Parkirne kazni gleda na tip vozila")
+plt.xlabel('Tip vozila')
+plt.ylabel('Št. parkirnih kazni')
+plt.show()
 
 print(vehicle_colors)
 print(vehicle_makes)
@@ -62,22 +62,22 @@ date_count = dataset.groupby(['Issue Date'])[['Issue Date']].agg('count')
 date_range = pd.date_range('03-01-2013', '09-01-2013')
 date_count = date_count.reindex(date_range, fill_value=0)
 # izris:
-# plt.plot(date_count)
-# plt.title("Število napisanih kazni 2013/2014", size=18)
-# plt.xlabel('Datum')
-# plt.xticks(rotation=90)
-# plt.ylabel('Št. parkirnih kazni')
-# plt.show()
+plt.plot(date_count)
+plt.title("Število napisanih kazni 2013/2014")
+plt.xlabel('Datum')
+plt.xticks(rotation=90)
+plt.ylabel('Št. parkirnih kazni')
+plt.show()
 
 # KAZNI GLEDE NA DAN V TEDNU:
 
 weekday_count = dataset.groupby(dataset['Issue Date'].dt.dayofweek).agg('count')['Issue Date']
 # izris:
-# plt.bar(np.array(['mon','tue','wed','thu','fri','sat','sun']), weekday_count)
-# plt.title("Kazni glede na dan v tednu 2013/2014", size=18)
-# plt.xlabel('Dan v tednu')
-# plt.ylabel('Skupno št. parkirnih kazni')
-# plt.show()
+plt.bar(np.array(['mon','tue','wed','thu','fri','sat','sun']), weekday_count)
+plt.title("Kazni glede na dan v tednu 2013/2014")
+plt.xlabel('Dan v tednu')
+plt.ylabel('Skupno št. parkirnih kazni')
+plt.show()
 
 # KAZNI GLEDE NA PROIZVAJALCA AVTOMOBILA (ABSOLUTNO)
 
@@ -88,7 +88,7 @@ vehicle_make_count = vehicle_make_count.sort_values(ascending=False)
 top_vehicle_make = vehicle_make_count.head(20)
 top_vehicle_make.plot.barh(top_vehicle_make)
 # izris:
-plt.title("Absolutno število kazni glede na proizvajalca avtomobila 2013/2014", size=18)
+plt.title("Absolutno število kazni glede na proizvajalca avtomobila 2013/2014")
 plt.xlabel('Število kazni')
 plt.ylabel('Proizvajalec')
 plt.show()
@@ -129,7 +129,7 @@ top_vehicle_make_r = top_vehicle_make_r.sort_values('Relative', ascending=False)
 print(top_vehicle_make_r)
 # izris:
 plt.barh(top_vehicle_make_r.index, top_vehicle_make_r['Relative'])
-plt.title("Relativno število kazni glede na proizvajalca avtomobila 2013/2014", size=18)
+plt.title("Relativno število kazni glede na proizvajalca avtomobila 2013/2014")
 plt.xlabel('Število kazni')
 plt.ylabel('Proizvajalec')
 plt.show()
