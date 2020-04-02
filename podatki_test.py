@@ -3,13 +3,11 @@ import matplotlib
 import pandas as pd
 import matplotlib.pyplot as plt
 
-# default dataset
-dataset = pd.read_csv("podatki/Parking_Violations_Issued_-_Fiscal_Year_2014__August_2013___June_2014__small.csv", parse_dates=['Issue Date'])
-
 
 def beri_dataset(filename):
     # branje in parsanje datumov v format datetime:
     return pd.read_csv(filename, parse_dates=['Issue Date'])
+
 
 def kazni_datum():
     """ GRAF ŠTEVILA KAZNI PO DATUMIH: """
@@ -111,6 +109,7 @@ def preberi_kazne():
     for i,j in zip(tipKazne["CODE"],tipKazne["All Other Areas"]):
         denar[i] = j
 
+
 def najvec_kazni():
     """ KATERE KAZNE SO NAJPOGOSTEJSE """
     x = kazne.copy()
@@ -133,6 +132,7 @@ def najvec_kazni():
     # plt.gcf().subplots_adjust(bottom=0.4)
     plt.show()
 
+
 def stevilo_denarjaOdKazni():
     steviloDenara = 0
     print(denar)
@@ -141,23 +141,46 @@ def stevilo_denarjaOdKazni():
             steviloDenara += int(denar[i])
     print("Skupno število denarja pridobljenega od vseh kazni: {e}$".format(e=steviloDenara))
 
+
+def kazni_leto():
+    """ ŠT. KAZNI PO LETIH """
+
+    st_kazni = [4716512+5821043, 5986831+5751009, 4872621+5368391]
+    # info o prebivalcih dobil na https://worldpopulationreview.com/us-cities/new-york-city-population/
+    prebivalci = [8398739, 8468181, 8475976]
+    leta = ['2014', '2015', '2016']
+    kazni__na_prebivalca = [k/p for k, p in zip(st_kazni, prebivalci)]
+
+    # izris:
+    plt.plot(leta, kazni__na_prebivalca)
+    plt.title("Število parkirnih kazni na prebivalca")
+    plt.ylabel('Št. kazni')
+    plt.xlabel('Leto')
+    plt.show()
+    # spike leta 2015, mogoce kaksen razlog
+
+
 # FULL DATASETS:
-file_2013_2014 = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2014__August_2013___June_2014_.csv'
+file_2014 = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2014__August_2013___June_2014_.csv'
 file_2015 = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2015.csv'
 file_2016 = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2016.csv'
 file_2017 = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2017.csv'
 
 # SAMPLE DATASETS:
-file_2013_2014_small = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2014__August_2013___June_2014__small.csv'
+file_2014_small = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2014__August_2013___June_2014__small.csv'
 file_2015_small = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2015_small.csv'
 file_2016_small = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2016_small.csv'
 file_2017_small = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2017_small.csv'
 
-dataset = beri_dataset(file_2013_2014_small)
+dataset = beri_dataset(file_2014_small)
+
 kazni_datum()
 kazni_dan_v_tednu()
 kazni_proizvajalec_abs()
 kazni_proizvajalec_rel()
+
 preberi_kazne()
 najvec_kazni()
 stevilo_denarjaOdKazni()
+
+kazni_leto()
