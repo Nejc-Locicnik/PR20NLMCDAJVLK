@@ -37,6 +37,8 @@ Za začetek smo za boljše razumevanje podatkov in kaj vse lahko z njimi naredim
 
 ![slika](slike/stevilo_kazni_na_povp_preb.png)
 
+![slika](slike/kazni_cas_2014.png)
+
 ### Problemi do zdaj
 __________________
 Manjši problem smo imeli pri nejasnih vrednostih, tipkarskih napak ali celo napačnih (datum) pri določenih atributih, kar smo k sreči lahko zaradi same velikosti podatkov (miljone primerov) ignorirali (cel primer).
