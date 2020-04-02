@@ -135,12 +135,11 @@ def stevilo_denarjaOdKazni():
         if int(i) in denar.keys():
             steviloDenara += int(denar[i])
     print("Ukupno število denarja pridobljenih od vseh kazni: {e}$".format(e=steviloDenara))
-=======
+
 file_2013_2014 = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2014__August_2013___June_2014_.csv'
 file_2015 = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2015.csv'
 file_2016 = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2016.csv'
 file_2017 = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2017.csv'
->>>>>>> 2b2925fbb0cc63b17dc91db801122151597bea63
 
 file_2013_2014_small = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2014__August_2013___June_2014__small.csv'
 file_2015_small = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2015_small.csv'
