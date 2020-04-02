@@ -19,6 +19,7 @@ def kazni_datum():
     date_range = pd.date_range('03-01-2013', '09-01-2013')
     date_count = date_count.reindex(date_range, fill_value=0)
     # izris:
+    plt.rcParams.update({'figure.autolayout': True})
     plt.plot(date_count)
     plt.title("Število napisanih kazni 2013/2014")
     plt.xlabel('Datum')
@@ -32,6 +33,7 @@ def kazni_dan_v_tednu():
 
     weekday_count = dataset.groupby(dataset['Issue Date'].dt.dayofweek).agg('count')['Issue Date']
     # izris:
+    plt.rcParams.update({'figure.autolayout': True})
     plt.bar(np.array(['mon','tue','wed','thu','fri','sat','sun']), weekday_count)
     plt.title("Kazni glede na dan v tednu 2013/2014")
     plt.xlabel('Dan v tednu')
@@ -49,6 +51,7 @@ def kazni_proizvajalec_abs():
     top_vehicle_make = vehicle_make_count.head(20)
     top_vehicle_make.plot.barh(top_vehicle_make)
     # izris:
+    plt.rcParams.update({'figure.autolayout': True})
     plt.title("Absolutno število kazni glede na proizvajalca avtomobila 2013/2014")
     plt.xlabel('Število kazni')
     plt.ylabel('Proizvajalec')
@@ -91,11 +94,13 @@ def kazni_proizvajalec_rel():
     top_vehicle_make_r = top_vehicle_make_r.sort_values('Relative', ascending=False)
     print(top_vehicle_make_r)
     # izris:
+    plt.rcParams.update({'figure.autolayout': True})
     plt.barh(top_vehicle_make_r.index, top_vehicle_make_r['Relative'])
     plt.title("Relativno število kazni glede na proizvajalca avtomobila 2013/2014")
     plt.xlabel('Število kazni')
     plt.ylabel('Proizvajalec')
     plt.show()
+
 
 kazne = {}
 denar = {}
@@ -119,12 +124,13 @@ def najvec_kazni():
     for i in x:
         if type(x[i]) == int:
             najpogostejse[i] = x[i]
-    plt.bar([kazne[i] for i in najpogostejse], list(najpogostejse.values()))
+    najpogostejse = {k: v for k, v in sorted(najpogostejse.items(), key=lambda item: item[1])}
+    plt.rcParams.update({'figure.autolayout': True})
+    plt.barh([kazne[i] for i in najpogostejse], list(najpogostejse.values()))
     plt.title("Število tipa kazni")
     plt.xlabel('Tip kazne')
     plt.ylabel('Število kazni')
-    plt.xticks(rotation=90)
-    plt.gcf().subplots_adjust(bottom=0.4)
+    # plt.gcf().subplots_adjust(bottom=0.4)
     plt.show()
 
 def stevilo_denarjaOdKazni():
@@ -133,13 +139,15 @@ def stevilo_denarjaOdKazni():
     for i in dataset["Violation Code"]:
         if int(i) in denar.keys():
             steviloDenara += int(denar[i])
-    print("Ukupno število denarja pridobljenih od vseh kazni: {e}$".format(e=steviloDenara))
+    print("Skupno število denarja pridobljenega od vseh kazni: {e}$".format(e=steviloDenara))
 
+# FULL DATASETS:
 file_2013_2014 = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2014__August_2013___June_2014_.csv'
 file_2015 = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2015.csv'
 file_2016 = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2016.csv'
 file_2017 = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2017.csv'
 
+# SAMPLE DATASETS:
 file_2013_2014_small = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2014__August_2013___June_2014__small.csv'
 file_2015_small = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2015_small.csv'
 file_2016_small = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2016_small.csv'
