@@ -3,21 +3,13 @@ import matplotlib
 import pandas as pd
 import matplotlib.pyplot as plt
 
-""" 
-fajli:
-- podatki/Parking_Violations_Issued_-_Fiscal_Year_2014__August_2013___June_2014_.csv
-- podatki/Parking_Violations_Issued_-_Fiscal_Year_2015.csv
-- podatki/Parking_Violations_Issued_-_Fiscal_Year_2016.csv
-- podatki/Parking_Violations_Issued_-_Fiscal_Year_2017.csv
-"""
-
-# zacetni dataset
+# default dataset
 dataset = pd.read_csv("podatki/Parking_Violations_Issued_-_Fiscal_Year_2014__August_2013___June_2014__small.csv", parse_dates=['Issue Date'])
 
 
 def beri_dataset(filename):
     # branje in parsanje datumov v format datetime:
-    dataset = pd.read_csv(filename, parse_dates=['Issue Date'])
+    return pd.read_csv(filename, parse_dates=['Issue Date'])
 
 
 def kazni_datum():
@@ -107,8 +99,22 @@ def kazni_proizvajalec_rel():
     plt.show()
 
 
-beri_dataset("podatki/Parking_Violations_Issued_-_Fiscal_Year_2014__August_2013___June_2014__small.csv")
+dataset = beri_dataset("podatki/Parking_Violations_Issued_-_Fiscal_Year_2014__August_2013___June_2014_.csv")
 kazni_datum()
 kazni_dan_v_tednu()
 kazni_proizvajalec_abs()
 kazni_proizvajalec_rel()
+
+
+""" 
+fajli:
+- podatki/Parking_Violations_Issued_-_Fiscal_Year_2014__August_2013___June_2014_.csv
+- podatki/Parking_Violations_Issued_-_Fiscal_Year_2015.csv
+- podatki/Parking_Violations_Issued_-_Fiscal_Year_2016.csv
+- podatki/Parking_Violations_Issued_-_Fiscal_Year_2017.csv
+
+- podatki/Parking_Violations_Issued_-_Fiscal_Year_2014__August_2013___June_2014__small.csv
+- podatki/Parking_Violations_Issued_-_Fiscal_Year_2015_small.csv
+- podatki/Parking_Violations_Issued_-_Fiscal_Year_2016_small.csv
+- podatki/Parking_Violations_Issued_-_Fiscal_Year_2017_small.csv
+"""
