@@ -98,23 +98,18 @@ def kazni_proizvajalec_rel():
     plt.ylabel('Proizvajalec')
     plt.show()
 
+file_2013_2014 = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2014__August_2013___June_2014_.csv'
+file_2015 = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2015.csv'
+file_2016 = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2016.csv'
+file_2017 = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2017.csv'
 
-dataset = beri_dataset("podatki/Parking_Violations_Issued_-_Fiscal_Year_2014__August_2013___June_2014_.csv")
+file_2013_2014_small = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2014__August_2013___June_2014__small.csv'
+file_2015_small = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2015_small.csv'
+file_2016_small = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2016_small.csv'
+file_2017_small = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2017_small.csv'
+
+dataset = beri_dataset(file_2013_2014_small)
 kazni_datum()
 kazni_dan_v_tednu()
 kazni_proizvajalec_abs()
 kazni_proizvajalec_rel()
-
-
-""" 
-fajli:
-- podatki/Parking_Violations_Issued_-_Fiscal_Year_2014__August_2013___June_2014_.csv
-- podatki/Parking_Violations_Issued_-_Fiscal_Year_2015.csv
-- podatki/Parking_Violations_Issued_-_Fiscal_Year_2016.csv
-- podatki/Parking_Violations_Issued_-_Fiscal_Year_2017.csv
-
-- podatki/Parking_Violations_Issued_-_Fiscal_Year_2014__August_2013___June_2014__small.csv
-- podatki/Parking_Violations_Issued_-_Fiscal_Year_2015_small.csv
-- podatki/Parking_Violations_Issued_-_Fiscal_Year_2016_small.csv
-- podatki/Parking_Violations_Issued_-_Fiscal_Year_2017_small.csv
-"""
