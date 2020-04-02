@@ -14,7 +14,7 @@ def kazni_datum():
 
     date_count = dataset.groupby(['Issue Date'])[['Issue Date']].agg('count')
     # dodajanje mankajočih datumov in jih fillat z ničlo:
-    date_range = pd.date_range('03-01-2013', '09-01-2013')
+    date_range = pd.date_range('07-01-2013', '06-1-2014')
     date_count = date_count.reindex(date_range, fill_value=0)
     # izris:
     plt.rcParams.update({'figure.autolayout': True})
@@ -42,7 +42,6 @@ def kazni_dan_v_tednu():
 def kazni_proizvajalec_abs():
     """ KAZNI GLEDE NA PROIZVAJALCA AVTOMOBILA (ABSOLUTNO) """
 
-    # dataset2 = pd.read_csv("podatki/Parking_Violations_Issued_-_Fiscal_Year_2014__August_2013___June_2014_.csv", parse_dates=['Issue Date'])
     vehicle_make_count = dataset.groupby(['Vehicle Make'])['Vehicle Make'].agg('count')
     # sortarinje padajoče:
     vehicle_make_count = vehicle_make_count.sort_values(ascending=False)
@@ -90,7 +89,6 @@ def kazni_proizvajalec_rel():
     top_vehicle_make_r = top_vehicle_make_r.assign(share=shares)
     top_vehicle_make_r['Relative'] = top_vehicle_make_r['Vehicle Make'] / top_vehicle_make_r.share
     top_vehicle_make_r = top_vehicle_make_r.sort_values('Relative', ascending=False)
-    print(top_vehicle_make_r)
     # izris:
     plt.rcParams.update({'figure.autolayout': True})
     plt.barh(top_vehicle_make_r.index, top_vehicle_make_r['Relative'])
@@ -119,40 +117,39 @@ def najvec_kazni():
                 x[i] += 1
             except:
                 x[i] = 1
-    najpogostejse = {}
+    najpogostejse = []
     for i in x:
         if type(x[i]) == int:
-            najpogostejse[i] = x[i]
-    najpogostejse = {k: v for k, v in sorted(najpogostejse.items(), key=lambda item: item[1])}
+            najpogostejse.append((x[i],i))
     plt.rcParams.update({'figure.autolayout': True})
-    plt.barh([kazne[i] for i in najpogostejse], list(najpogostejse.values()))
+    plt.barh([kazne[j] for i,j in sorted(najpogostejse,reverse=True)[:20]], [i for i,j in sorted(najpogostejse,reverse=True)[:20]])
     plt.title("Število tipa kazni")
     plt.xlabel('Tip kazne')
     plt.ylabel('Število kazni')
+    plt.xticks(rotation=90)
     # plt.gcf().subplots_adjust(bottom=0.4)
     plt.show()
 
 
 def stevilo_denarjaOdKazni():
     steviloDenara = 0
-    print(denar)
     for i in dataset["Violation Code"]:
         if int(i) in denar.keys():
             steviloDenara += int(denar[i])
     print("Skupno število denarja pridobljenega od vseh kazni: {e}$".format(e=steviloDenara))
 
 
-def kazni_leto():
+def kazni_leto_na_prebivalca():
     """ ŠT. KAZNI PO LETIH """
 
     st_kazni = [4716512+5821043, 5986831+5751009, 4872621+5368391]
     # info o prebivalcih dobil na https://worldpopulationreview.com/us-cities/new-york-city-population/
     prebivalci = [8398739, 8468181, 8475976]
     leta = ['2014', '2015', '2016']
-    kazni__na_prebivalca = [k/p for k, p in zip(st_kazni, prebivalci)]
+    kazni_na_prebivalca = [k/p for k, p in zip(st_kazni, prebivalci)]
 
     # izris:
-    plt.plot(leta, kazni__na_prebivalca)
+    plt.plot(leta, kazni_na_prebivalca)
     plt.title("Število parkirnih kazni na prebivalca")
     plt.ylabel('Št. kazni')
     plt.xlabel('Leto')
@@ -177,10 +174,10 @@ dataset = beri_dataset(file_2014_small)
 kazni_datum()
 kazni_dan_v_tednu()
 kazni_proizvajalec_abs()
-kazni_proizvajalec_rel()
+kazni_proizvajalec_rel()  # pravilno delujoče zgolj za file_2013_2014
 
 preberi_kazne()
 najvec_kazni()
 stevilo_denarjaOdKazni()
 
-kazni_leto()
+kazni_leto_na_prebivalca()
