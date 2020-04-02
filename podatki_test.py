@@ -19,7 +19,6 @@ def beri_dataset(filename):
     # branje in parsanje datumov v format datetime:
     dataset = pd.read_csv(filename, parse_dates=['Issue Date'])
 
-
 def kazni_datum():
     """ GRAF ŠTEVILA KAZNI PO DATUMIH: """
 
@@ -106,9 +105,49 @@ def kazni_proizvajalec_rel():
     plt.ylabel('Proizvajalec')
     plt.show()
 
+kazne = {}
+denar = {}
+def preberi_kazne():
+    tipKazne = pd.read_csv("podatki/DOF_Parking_Violation_Codes.csv")
+    for i,j in zip(tipKazne["CODE"],tipKazne["DEFINITION"]):
+        kazne[i] = j
+    for i,j in zip(tipKazne["CODE"],tipKazne["All Other Areas"]):
+        denar[i] = j
+
+def najvec_kazni():
+    """ KATERE KAZNE SO NAJPOGOSTEJSE """
+    x = kazne.copy()
+    for i in dataset["Violation Code"]:
+        if i in kazne:
+            try:
+                x[i] += 1
+            except:
+                x[i] = 1
+    najpogostejse = {}
+    for i in x:
+        if type(x[i]) == int:
+            najpogostejse[i] = x[i]
+    plt.bar([kazne[i] for i in najpogostejse], list(najpogostejse.values()))
+    plt.title("Število tipa kazni")
+    plt.xlabel('Tip kazne')
+    plt.ylabel('Število kazni')
+    plt.xticks(rotation=90)
+    plt.gcf().subplots_adjust(bottom=0.4)
+    plt.show()
+
+def stevilo_denarjaOdKazni():
+    steviloDenara = 0
+    print(denar)
+    for i in dataset["Violation Code"]:
+        if int(i) in denar.keys():
+            steviloDenara += int(denar[i])
+    print("Ukupno število denarja pridobljenih od vseh kazni: {e}$".format(e=steviloDenara))
 
 beri_dataset("podatki/Parking_Violations_Issued_-_Fiscal_Year_2014__August_2013___June_2014__small.csv")
 kazni_datum()
 kazni_dan_v_tednu()
 kazni_proizvajalec_abs()
 kazni_proizvajalec_rel()
+preberi_kazne()
+najvec_kazni()
+stevilo_denarjaOdKazni()
