@@ -97,7 +97,6 @@ def kazni_proizvajalec_rel():
     plt.ylabel('Proizvajalec')
     plt.show()
 
-<<<<<<< HEAD
 kazne = {}
 denar = {}
 def preberi_kazne():
