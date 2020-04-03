@@ -2,11 +2,27 @@ import numpy as np
 import matplotlib
 import pandas as pd
 import matplotlib.pyplot as plt
-
+from pandas.plotting import register_matplotlib_converters
+register_matplotlib_converters()
 
 def beri_dataset(filename):
-    # branje in parsanje datumov v format datetime:
-    return pd.read_csv(filename, parse_dates=['Issue Date'])
+    """ BRANJE IN PARSANJE DATUMOV V DATETIME: """
+
+    dataset = pd.DataFrame()
+    # stolpci katere želimo brati:
+    columns = [
+        'Plate ID', 'Registration State', 'Issue Date',
+        'Violation Code', 'Vehicle Body Type', 'Vehicle Make',
+        'Issuing Agency', 'Vehicle Expiration Date', 'Violation Time',
+        'Violation County', 'Violation In Front Of Or Opposite', 'Vehicle Color',
+        'Unregistered Vehicle?', 'Vehicle Year', 'Latitude',
+        'Longitude'
+    ]
+    # optimizacija - ne beremo več celotnega dataseta v RAM hkrati (preprečitev memory errorjev)
+    for chunk in pd.read_csv(filename, parse_dates=['Issue Date'], chunksize=1000000, usecols=columns,
+                             dtype={"Violation County": str, 'Violation In Front Of Or Opposite': str}):
+        dataset = pd.concat([dataset, chunk], ignore_index=True)
+    return dataset
 
 
 def kazni_datum_group_teden():
@@ -20,7 +36,7 @@ def kazni_datum_group_teden():
     # grupiramo vsak teden in seštejemo število kazni v tistem tednu:
     date_count = date_count.groupby([pd.Grouper(key='Issue Date', freq='W-MON')])['count'].sum().reset_index()
     # filtriranje datumov, ki ne bi smeli obstajati:
-    date_count = date_count[ (date_count['Issue Date'] > '2013-07-25') & (date_count['Issue Date'] < '2014-06-20') ]
+    date_count = date_count[(date_count['Issue Date'] > '2013-07-25') & (date_count['Issue Date'] < '2014-06-20')]
     # "Issue Date" nazaj v index dataframa:
     date_count = date_count.set_index('Issue Date')
     # izris:
@@ -40,7 +56,7 @@ def kazni_dan_v_tednu():
     weekday_count = dataset.groupby(dataset['Issue Date'].dt.dayofweek).agg('count')['Issue Date']
     # izris:
     plt.rcParams.update({'figure.autolayout': True})
-    plt.bar(np.array(['mon','tue','wed','thu','fri','sat','sun']), weekday_count)
+    plt.bar(np.array(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']), weekday_count)
     plt.title("Kazni glede na dan v tednu 2013/2014")
     plt.xlabel('Dan v tednu')
     plt.ylabel('Skupno št. parkirnih kazni')
@@ -73,10 +89,10 @@ def kazni_proizvajalec_rel():
     top_vehicle_make_r = top_vehicle_make_r.to_frame()
     # 2014 market share (https://www.goodcarbadcar.net/december-2014-usa-autosales-brand-results-rankings/)
     shares = np.array([
-        14.4, # FORD
-        12.1, # TOYOT
+        14.4,  # FORD
+        12.1,  # TOYOT
         8.3,  # HONDA
-        12.3, # CHEVR
+        12.3,  # CHEVR
         7.7,  # NISSA
         3.5,  # DODGE
         3.0,  # GMC
@@ -108,11 +124,13 @@ def kazni_proizvajalec_rel():
 
 kazne = {}
 denar = {}
+
+
 def preberi_kazne():
     tipKazne = pd.read_csv("podatki/DOF_Parking_Violation_Codes.csv")
-    for i,j in zip(tipKazne["CODE"],tipKazne["DEFINITION"]):
+    for i, j in zip(tipKazne["CODE"], tipKazne["DEFINITION"]):
         kazne[i] = j
-    for i,j in zip(tipKazne["CODE"],tipKazne["All Other Areas"]):
+    for i, j in zip(tipKazne["CODE"], tipKazne["All Other Areas"]):
         denar[i] = j
 
 
@@ -128,9 +146,10 @@ def najvec_kazni():
     najpogostejse = []
     for i in x:
         if type(x[i]) == int:
-            najpogostejse.append((x[i],i))
+            najpogostejse.append((x[i], i))
     plt.rcParams.update({'figure.autolayout': True})
-    plt.barh([kazne[j] for i,j in sorted(najpogostejse,reverse=True)[:20]], [i for i,j in sorted(najpogostejse,reverse=True)[:20]])
+    plt.barh([kazne[j] for i, j in sorted(najpogostejse, reverse=True)[:20]],
+             [i for i, j in sorted(najpogostejse, reverse=True)[:20]])
     plt.title("Število tipa kazni")
     plt.xlabel('Tip kazne')
     plt.ylabel('Število kazni')
@@ -150,11 +169,11 @@ def stevilo_denarjaOdKazni():
 def kazni_leto_na_prebivalca():
     """ ŠT. KAZNI PO LETIH """
 
-    st_kazni = [4716512+5821043, 5986831+5751009, 4872621+5368391]
+    st_kazni = [4716512 + 5821043, 5986831 + 5751009, 4872621 + 5368391]
     # info o prebivalcih dobil na https://worldpopulationreview.com/us-cities/new-york-city-population/
     prebivalci = [8398739, 8468181, 8475976]
     leta = ['2014', '2015', '2016']
-    kazni_na_prebivalca = [k/p for k, p in zip(st_kazni, prebivalci)]
+    kazni_na_prebivalca = [k / p for k, p in zip(st_kazni, prebivalci)]
 
     # izris:
     plt.plot(leta, kazni_na_prebivalca)
