@@ -1,5 +1,5 @@
 
-# PR20NLMCDAJVLK
+# PR20NLMCDAJVLK - Analiza parkirnih kazni v NYC
 ____________
 Projektna naloga, Podatkovno rudarjenje, 2020
 
