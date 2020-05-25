@@ -18,11 +18,28 @@ file_2015_small = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2015_small.cs
 file_2016_small = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2016_small.csv'
 file_2017_small = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2017_small.csv'
 
+# tabela polnih imen znamk - po potrebi se lahko se dodajo
+makes_full_names = np.flipud(np.array([
+    ["MITSUBISHI", "MITSU"],
+    ["MERCURY", "MERCU"],
+    ["VOLKSWAGEN", "VOLKS"],
+    ["MERCEDES-BENZ", "ME/BE"],
+    ["ACURA", "ACURA"],
+    ["INFINITI", "INFIN"],
+    ["HYUNDAI", "HYUND"],
+    ["NISSAN", "NISSA"],
+    ["CHRYSLER", "CHRYS"],
+    ["CHEVROLET", "CHEVR"],
+    ["TOYOTA", "TOYOT"],
+    ["LINCOLN", "LINCO"],
+    ["INT. HARVESTER", "INTER"],
+    ["FRUEHAUF", "FRUEH"]]))
+
 
 def main():
     #kazni_datum_group_teden()
     #kazni_dan_v_tednu()
-    #kazni_proizvajalec_abs()
+    kazni_proizvajalec_abs()
     kazni_proizvajalec_rel()  # pravilno delujoče zgolj za file_2014
 
     #preberi_kazne()
@@ -100,7 +117,12 @@ def kazni_proizvajalec_abs():
     # sortarinje padajoče:
     vehicle_make_count = vehicle_make_count.sort_values(ascending=False)
     top_vehicle_make = vehicle_make_count.head(20)
+
+    # polna imena
+    top_vehicle_make = top_vehicle_make.rename({b: a for a, b in makes_full_names})
+
     top_vehicle_make.plot.barh(top_vehicle_make)
+
     # izris:
     plt.rcParams.update({'figure.autolayout': True})
     plt.title("Absolutno število kazni glede na proizvajalca avtomobila 2013/2014")
@@ -144,32 +166,13 @@ def kazni_proizvajalec_rel():
     top_vehicle_make_r['Relative'] = top_vehicle_make_r['Vehicle Make'] / top_vehicle_make_r.share
     top_vehicle_make_r = top_vehicle_make_r.sort_values('Relative', ascending=False)
 
-    makes_full_names = np.flipud(np.array([
-        "DODGE",            # DODGE
-        "LEXUS",            # LEXUS
-        "KIA",              # KIA
-        "HONDA",            # HONDA
-        "FORD",             # FORD
-        "TOYOTA",           # TOYOT
-        "ACURA",            # ACURA
-        "CHEVROLET",        # CHEVR
-        "MERCEDES-BENZ",    # ME/BE
-        "HYUNDAI",          # HYUND
-        "CHRYSLER",         # CHRYS
-        "AUDI",             # AUDI
-        "VOLVO",            # INFIN
-        "NISSAN",           # NISSAN
-        "INFINITI",         # INFIN
-        "MITSUBISHI",       # MITSU
-        "BMW",              # BMW
-        "JEEP",             # JEEP
-        "VOLKSWAGEN",       # VOLKS
-        "MERCURY"]          # MERCU
-    ))
+    # polna imena
+    top_vehicle_make_r = top_vehicle_make_r.rename({b: a for a, b in makes_full_names})
 
     # izris:
     plt.rcParams.update({'figure.autolayout': True})
-    plt.barh(makes_full_names, top_vehicle_make_r['Relative'])  # menjal [top_vehicle_make_r.index] z [makes_full_names]
+
+    plt.barh(top_vehicle_make_r.index, top_vehicle_make_r['Relative'])
     plt.title("Relativno število kazni glede na proizvajalca avtomobila 2013/2014")
     plt.xlabel('Število kazni')
     plt.ylabel('Proizvajalec')
