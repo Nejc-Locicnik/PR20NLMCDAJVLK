@@ -24,7 +24,6 @@ makes_full_names = np.flipud(np.array([
     ["MERCURY", "MERCU"],
     ["VOLKSWAGEN", "VOLKS"],
     ["MERCEDES-BENZ", "ME/BE"],
-    ["ACURA", "ACURA"],
     ["INFINITI", "INFIN"],
     ["HYUNDAI", "HYUND"],
     ["NISSAN", "NISSA"],
