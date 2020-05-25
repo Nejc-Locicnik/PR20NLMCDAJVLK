@@ -20,16 +20,16 @@ file_2017_small = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2017_small.cs
 
 
 def main():
-    kazni_datum_group_teden()
-    kazni_dan_v_tednu()
-    kazni_proizvajalec_abs()
+    #kazni_datum_group_teden()
+    #kazni_dan_v_tednu()
+    #kazni_proizvajalec_abs()
     kazni_proizvajalec_rel()  # pravilno delujoče zgolj za file_2014
 
-    preberi_kazne()
-    najvec_kazni()
-    stevilo_denarjaOdKazni()
+    #preberi_kazne()
+    #najvec_kazni()
+    #stevilo_denarjaOdKazni()
 
-    kazni_leto_na_prebivalca()
+    #kazni_leto_na_prebivalca()
 
 
 def beri_dataset(filename):
@@ -143,9 +143,33 @@ def kazni_proizvajalec_rel():
     top_vehicle_make_r = top_vehicle_make_r.assign(share=shares)
     top_vehicle_make_r['Relative'] = top_vehicle_make_r['Vehicle Make'] / top_vehicle_make_r.share
     top_vehicle_make_r = top_vehicle_make_r.sort_values('Relative', ascending=False)
+
+    makes_full_names = np.flipud(np.array([
+        "DODGE",            # DODGE
+        "LEXUS",            # LEXUS
+        "KIA",              # KIA
+        "HONDA",            # HONDA
+        "FORD",             # FORD
+        "TOYOTA",           # TOYOT
+        "ACURA",            # ACURA
+        "CHEVROLET",        # CHEVR
+        "MERCEDES-BENZ",    # ME/BE
+        "HYUNDAI",          # HYUND
+        "CHRYSLER",         # CHRYS
+        "AUDI",             # AUDI
+        "VOLVO",            # INFIN
+        "NISSAN",           # NISSAN
+        "INFINITI",         # INFIN
+        "MITSUBISHI",       # MITSU
+        "BMW",              # BMW
+        "JEEP",             # JEEP
+        "VOLKSWAGEN",       # VOLKS
+        "MERCURY"]          # MERCU
+    ))
+
     # izris:
     plt.rcParams.update({'figure.autolayout': True})
-    plt.barh(top_vehicle_make_r.index, top_vehicle_make_r['Relative'])
+    plt.barh(makes_full_names, top_vehicle_make_r['Relative'])  # menjal [top_vehicle_make_r.index] z [makes_full_names]
     plt.title("Relativno število kazni glede na proizvajalca avtomobila 2013/2014")
     plt.xlabel('Število kazni')
     plt.ylabel('Proizvajalec')
