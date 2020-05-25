@@ -86,7 +86,7 @@ def kazni_dan_v_tednu():
     weekday_count = dataset.groupby(dataset['Issue Date'].dt.dayofweek).agg('count')['Issue Date']
     # izris:
     plt.rcParams.update({'figure.autolayout': True})
-    plt.bar(np.array(['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun']), weekday_count)
+    plt.bar(np.array(['pon', 'tor', 'sre', 'čet', 'pet', 'sob', 'ned']), weekday_count)
     plt.title("Kazni glede na dan v tednu 2013/2014")
     plt.xlabel('Dan v tednu')
     plt.ylabel('Skupno št. parkirnih kazni')
