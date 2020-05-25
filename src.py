@@ -5,6 +5,33 @@ import matplotlib.pyplot as plt
 from pandas.plotting import register_matplotlib_converters
 register_matplotlib_converters()
 
+
+# FULL DATASETS:
+file_2014 = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2014__August_2013___June_2014_.csv'
+file_2015 = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2015.csv'
+file_2016 = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2016.csv'
+file_2017 = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2017.csv'
+
+# SAMPLE DATASETS:
+file_2014_small = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2014__August_2013___June_2014__small.csv'
+file_2015_small = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2015_small.csv'
+file_2016_small = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2016_small.csv'
+file_2017_small = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2017_small.csv'
+
+
+def main():
+    kazni_datum_group_teden()
+    kazni_dan_v_tednu()
+    kazni_proizvajalec_abs()
+    kazni_proizvajalec_rel()  # pravilno delujoče zgolj za file_2014
+
+    preberi_kazne()
+    najvec_kazni()
+    stevilo_denarjaOdKazni()
+
+    kazni_leto_na_prebivalca()
+
+
 def beri_dataset(filename):
     """ BRANJE IN PARSANJE DATUMOV V DATETIME: """
 
@@ -23,6 +50,9 @@ def beri_dataset(filename):
                              dtype={"Violation County": str, 'Violation In Front Of Or Opposite': str}):
         dataset = pd.concat([dataset, chunk], ignore_index=True)
     return dataset
+
+
+dataset = beri_dataset(file_2014_small)
 
 
 def kazni_datum_group_teden():
@@ -169,6 +199,7 @@ def stevilo_denarjaOdKazni():
 def kazni_leto_na_prebivalca():
     """ ŠT. KAZNI PO LETIH """
 
+    # izracunano za dejanska leta 2014, 2015 in 2016
     st_kazni = [4716512 + 5821043, 5986831 + 5751009, 4872621 + 5368391]
     # info o prebivalcih dobil na https://worldpopulationreview.com/us-cities/new-york-city-population/
     prebivalci = [8398739, 8468181, 8475976]
@@ -184,27 +215,4 @@ def kazni_leto_na_prebivalca():
     # spike leta 2015, mogoce kaksen razlog
 
 
-# FULL DATASETS:
-file_2014 = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2014__August_2013___June_2014_.csv'
-file_2015 = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2015.csv'
-file_2016 = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2016.csv'
-file_2017 = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2017.csv'
-
-# SAMPLE DATASETS:
-file_2014_small = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2014__August_2013___June_2014__small.csv'
-file_2015_small = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2015_small.csv'
-file_2016_small = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2016_small.csv'
-file_2017_small = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2017_small.csv'
-
-dataset = beri_dataset(file_2014_small)
-
-kazni_datum_group_teden()
-kazni_dan_v_tednu()
-kazni_proizvajalec_abs()
-kazni_proizvajalec_rel()  # pravilno delujoče zgolj za file_2013_2014
-
-preberi_kazne()
-najvec_kazni()
-stevilo_denarjaOdKazni()
-
-kazni_leto_na_prebivalca()
+main()
