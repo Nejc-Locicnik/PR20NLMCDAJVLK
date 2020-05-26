@@ -24,7 +24,6 @@ makes_full_names = np.flipud(np.array([
     ["MERCURY", "MERCU"],
     ["VOLKSWAGEN", "VOLKS"],
     ["MERCEDES-BENZ", "ME/BE"],
-    ["ACURA", "ACURA"],
     ["INFINITI", "INFIN"],
     ["HYUNDAI", "HYUND"],
     ["NISSAN", "NISSA"],
@@ -39,14 +38,15 @@ makes_full_names = np.flipud(np.array([
 def main():
     #kazni_datum_group_teden()
     #kazni_dan_v_tednu()
-    kazni_proizvajalec_abs()
-    kazni_proizvajalec_rel()  # pravilno delujoče zgolj za file_2014
+    #kazni_proizvajalec_abs()
+    #kazni_proizvajalec_rel()  # pravilno delujoče zgolj za file_2014
 
     #preberi_kazne()
     #najvec_kazni()
     #stevilo_denarjaOdKazni()
 
     #kazni_leto_na_prebivalca()
+    kazni_distrikt()
 
 
 def beri_dataset(filename):
@@ -59,9 +59,11 @@ def beri_dataset(filename):
         'Violation Code', 'Vehicle Body Type', 'Vehicle Make',
         'Issuing Agency', 'Vehicle Expiration Date', 'Violation Time',
         'Violation County', 'Violation In Front Of Or Opposite', 'Vehicle Color',
-        'Unregistered Vehicle?', 'Vehicle Year', 'Latitude',
-        'Longitude'
+        'Unregistered Vehicle?', 'Vehicle Year', 'Street Name'
     ]
+
+    print(columns)
+
     # optimizacija - ne beremo več celotnega dataseta v RAM hkrati (preprečitev memory errorjev)
     for chunk in pd.read_csv(filename, parse_dates=['Issue Date'], chunksize=1000000, usecols=columns,
                              dtype={"Violation County": str, 'Violation In Front Of Or Opposite': str}):
@@ -69,7 +71,7 @@ def beri_dataset(filename):
     return dataset
 
 
-dataset = beri_dataset(file_2014_small)
+dataset = beri_dataset(file_2016_small)
 
 
 def kazni_datum_group_teden():
@@ -179,6 +181,39 @@ def kazni_proizvajalec_rel():
     plt.show()
 
 
+def trans(tip):
+    # po potrebi se se lahko dodajo
+    prevodi = {
+        "NON-COMPLIANCE W/ POSTED SIGN": "Neupoštevanje znaka",
+        "NO MATCH-PLATE/STICKER": "Neujemajoča tablica/nalepka",
+        "NGHT PKG ON RESID STR-COMM VEH": "Nočno parkiranje - gosp. vozilo",
+        "OBSTRUCTING TRAFFIC/INTERSECT": "Oviranje prometa/križišča",
+        "NO STANDING-EXC. TRUCK LOADING": "Prepoved stojenja",
+        "DOUBLE PARKING": "Dvojno parkiranje",
+        "DOUBLE PARKING-MIDTOWN COMML": "Dvojno parkiranje - sredi mesta",
+        "CROSSWALK": "Prehod za pešce",
+        "NO STANDING-DAY/TIME LIMITS": "Prepovedano parkiranje",
+        "NO STANDING-BUS STOP": "Prepoved stojenja - avtob. postaja",
+        "BUS LANE VIOLATION": "Kršitev avtobusnega pasu",
+        "FIRE HYDRANT": "Požarni hidrant",
+        "FAIL TO DISP. MUNI METER RECPT": "Brez parkirnega listka",
+        "FAILURE TO STOP AT RED LIGHT": "Neupoštevanje rdeče luči",
+        "EXPIRED MUNI METER": "Potečen parkirni listek",
+        "NO PARKING-DAY/TIME LIMITS": "Prepoved parkiranja",
+        "INSP. STICKER-EXPIRED/MISSING": "Potečena ali manjkajoča nalepka",
+        "PHTO SCHOOL ZN SPEED VIOLATION": "Omejena hitrost šolske cone",
+        "FAIL TO DSPLY MUNI METER RECPT": "Brez parkirnega listka",
+        "NO PARKING-STREET CLEANING": "Prepovedano parkiranje - čiščenje",
+        "BIKE LANE": "Kolesarski pas",
+        "FRONT OR BACK PLATE MISSING": "Manjkajoča tablica",
+        "NO STANDING-COMM METER ZONE": "Prepovedano parkiranje",
+        "REG. STICKER-EXPIRED/MISSING": "Potečena/manjkajoča reg. nalepka"
+    }
+    if tip in prevodi:
+        tip = prevodi[tip]
+    return tip
+
+
 kazne = {}
 denar = {}
 
@@ -186,7 +221,7 @@ denar = {}
 def preberi_kazne():
     tipKazne = pd.read_csv("podatki/DOF_Parking_Violation_Codes.csv")
     for i, j in zip(tipKazne["CODE"], tipKazne["DEFINITION"]):
-        kazne[i] = j
+        kazne[i] = trans(j) # klice se prevod
     for i, j in zip(tipKazne["CODE"], tipKazne["All Other Areas"]):
         denar[i] = j
 
@@ -205,12 +240,13 @@ def najvec_kazni():
         if type(x[i]) == int:
             najpogostejse.append((x[i], i))
     plt.rcParams.update({'figure.autolayout': True})
+
     plt.barh([kazne[j] for i, j in sorted(najpogostejse, reverse=True)[:20]],
              [i for i, j in sorted(najpogostejse, reverse=True)[:20]])
     plt.title("Število tipa kazni")
     plt.xlabel('Tip kazne')
     plt.ylabel('Število kazni')
-    plt.xticks(rotation=90)
+    # plt.xticks(rotation=90)
     # plt.gcf().subplots_adjust(bottom=0.4)
     plt.show()
 
@@ -242,4 +278,123 @@ def kazni_leto_na_prebivalca():
     # spike leta 2015, mogoce kaksen razlog
 
 
+def kazni_distrikt():
+    """ Demografika NYC: https://en.wikipedia.org/wiki/Demographics_of_New_York_City
+    - Ni tocnih podatkov za vsako leto, vzamem avg 2010 in 2019
+
+    - Staten Island:
+    # 2010 - 468,730
+    # 2019 - 476,143
+
+    - Bronx:
+    # 2010 - 1,385,108
+    # 2019 - 1,418,207
+
+    - Queens:
+    # 2010 - 2,230,722
+    # 2019 - 2,253,858
+
+    - Brooklyn:
+    # 2010 - 2,504,700
+    # 2019 - 2,559,903
+
+    - Manhattan:
+    # 2010 - 1,585,873
+    # 2019 - 1,628,706  """
+
+    """ funkcije za izracun kazni v distriktih """
+    # streets = dataset[(dataset['Issue Date'] > '2016-01-01 00:30:00')&(dataset['Issue Date'] < '2016-12-31 00:30:00')]
+    # streets = streets.groupby(['Violation County'])['Violation County'].agg('count')
+
+    districts = ['Staten Island', 'Bronx', 'Queens', 'Brooklyn', 'Manhattan']
+    pop_district = [944873, 2803315, 4484580, 5064603, 3214579]
+
+    leta = ['2014', '2015', '2016']
+    kazni_2014 = [59714 + 62429,  504189 + 580031, 953598 + 1024853, 1016539 + 1158171, 1846962 + 1975193]
+    kazni_2015 = [51856 + 53971,  602852 + 582918, 1139422 + 1009489, 1236619 + 1190294, 2133928 + 1853098]
+    kazni_2016 = [50195 + 130140, 495769 + 672460, 886512 + 1261145, 1088374 + 1589315, 1694160 + 1693039]
+
+    kazni_pop = []
+
+    for kazni in [kazni_2014, kazni_2015, kazni_2016]:
+        kazni_leto = []
+        for ime, kazni, pop in zip(districts, kazni, pop_district):
+            kazni_leto.append(kazni/pop)
+        kazni_pop.append(kazni_leto)
+
+    kazni_pop.reverse()
+    # izris:
+    legend=[]
+    for j in reversed(range(5)):  # vsak distrikt
+        l, = plt.plot(leta, [kazni_pop[i][j] for i in range(3)], label=districts[j], linewidth=3.0)    # vsako leto
+        legend.append(l)
+    plt.legend(handles=legend, bbox_to_anchor=(0.8, 0.45))
+
+    plt.title("Število parkirnih kazni na prebivalca za posamezen distrikt")
+    plt.ylabel('Št. kazni na preb.')
+    plt.xlabel('Leto')
+    plt.show()
+
+
 main()
+""" 2014 <- file_2014
+#       BRONX           504189
+#       BROOKLYN        1016539
+#       MANHATTAN       1846962
+#       QUEENS          953598
+#       STATEN ISLAND   59714
+"""
+"""     2014 <- file_2015
+#       BRONX           580031
+#       BROOKLYN        1158171
+#       MANHATTAN       1975193
+#       QUEENS          1024853
+#       STATEN ISLAND   62429
+"""
+"""     2015 <- file_2015
+#       BRONX           602852
+#       BROOKLYN        1236619
+#       MANHATTAN       2133928
+#       QUEENS          1139422
+#       STATEN ISLAND   51856
+"""
+"""
+#   2015 <- file_2016
+#       BRONX           582918
+#       BROOKLYN        1190294
+#       MANHATTAN       1853098
+#       QUEENS          1009489
+#       STATEN ISLAND   53971
+"""
+
+"""
+#   2016 <- file_2016
+#       BRONX           495769
+#       BROOKLYN        1088374
+#       MANHATTAN       1694160
+#       QUEENS          886512
+#       STATEN ISLAND   50195
+"""
+
+"""
+Violation County
+
+BX        495769
+
+K        1006044 + 82330
+
+NY       1684424 + 9736
+
+Q         825206 + 61306
+
+ST         10401 + 39794
+"""
+
+"""
+#   2016 <- file_2017
+#       BRONX           672460
+#       BROOKLYN        1589315
+#       MANHATTAN       1693039
+#       QUEENS          1261145
+#       STATEN ISLAND   130140
+"""
