@@ -36,16 +36,16 @@ makes_full_names = np.flipud(np.array([
 
 
 def main():
-    #kazni_datum_group_teden()
-    #kazni_dan_v_tednu()
-    #kazni_proizvajalec_abs()
-    #kazni_proizvajalec_rel()  # pravilno delujoče zgolj za file_2014
+    kazni_datum_group_teden()
+    kazni_dan_v_tednu()
+    kazni_proizvajalec_abs()
+    kazni_proizvajalec_rel()  # pravilno delujoče zgolj za file_2014
 
-    #preberi_kazne()
-    #najvec_kazni()
-    #stevilo_denarjaOdKazni()
+    preberi_kazne()
+    najvec_kazni()
+    stevilo_denarjaOdKazni()
 
-    #kazni_leto_na_prebivalca()
+    kazni_leto_na_prebivalca()
     kazni_distrikt()
 
 
