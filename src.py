@@ -36,18 +36,18 @@ makes_full_names = np.flipud(np.array([
 
 
 def main():
-    kazni_datum_group_teden()
-    kazni_dan_v_tednu()
-    kazni_proizvajalec_abs()
-    kazni_proizvajalec_rel()  # pravilno delujoče zgolj za file_2014
+    #kazni_datum_group_teden()
+    #kazni_dan_v_tednu()
+    #kazni_proizvajalec_abs()
+    #kazni_proizvajalec_rel()  # pravilno delujoče zgolj za file_2014
 
-    preberi_kazne()
-    najvec_kazni()
-    stevilo_denarjaOdKazni()
+    #preberi_kazne()
+    #najvec_kazni()
+    #stevilo_denarjaOdKazni()
 
-    kazni_leto_na_prebivalca()
-    kazni_distrikt()
-
+    #kazni_leto_na_prebivalca()
+    #kazni_distrikt()
+    tip_kazni_distrikt()
 
 def beri_dataset(filename):
     """ BRANJE IN PARSANJE DATUMOV V DATETIME: """
@@ -71,7 +71,7 @@ def beri_dataset(filename):
     return dataset
 
 
-dataset = beri_dataset(file_2016_small)
+dataset = beri_dataset(file_2017_small)
 
 
 def kazni_datum_group_teden():
@@ -196,13 +196,13 @@ def trans(tip):
         "NO STANDING-BUS STOP": "Prepoved stojenja - avtob. postaja",
         "BUS LANE VIOLATION": "Kršitev avtobusnega pasu",
         "FIRE HYDRANT": "Požarni hidrant",
-        "FAIL TO DISP. MUNI METER RECPT": "Brez parkirnega listka",
+        "FAIL TO DISP. MUNI METER RECPT": "1 Brez parkirnega listka",
         "FAILURE TO STOP AT RED LIGHT": "Neupoštevanje rdeče luči",
         "EXPIRED MUNI METER": "Potečen parkirni listek",
         "NO PARKING-DAY/TIME LIMITS": "Prepoved parkiranja",
         "INSP. STICKER-EXPIRED/MISSING": "Potečena ali manjkajoča nalepka",
         "PHTO SCHOOL ZN SPEED VIOLATION": "Omejena hitrost šolske cone",
-        "FAIL TO DSPLY MUNI METER RECPT": "Brez parkirnega listka",
+        "FAIL TO DSPLY MUNI METER RECPT": "2 Brez parkirnega listka",
         "NO PARKING-STREET CLEANING": "Prepovedano parkiranje - čiščenje",
         "BIKE LANE": "Kolesarski pas",
         "FRONT OR BACK PLATE MISSING": "Manjkajoča tablica",
@@ -246,7 +246,6 @@ def najvec_kazni():
     plt.title("Število tipa kazni")
     plt.xlabel('Tip kazne')
     plt.ylabel('Število kazni')
-    # plt.xticks(rotation=90)
     # plt.gcf().subplots_adjust(bottom=0.4)
     plt.show()
 
@@ -276,6 +275,29 @@ def kazni_leto_na_prebivalca():
     plt.xlabel('Leto')
     plt.show()
     # spike leta 2015, mogoce kaksen razlog
+
+
+def tip_kazni_distrikt():
+    kazni = {}
+
+    vrste_kazni = pd.read_csv("podatki/DOF_Parking_Violation_Codes.csv")
+    for i, j in zip(vrste_kazni["CODE"], vrste_kazni["DEFINITION"]):
+        kazni[i] = trans(j)     # klice se prevod
+
+    kazni_m = kazni.copy()
+    for ticket in dataset["Violation Code"]:
+        if ticket in kazni:
+            try:
+                kazni_m[ticket] += 1
+            except:
+                kazni_m[ticket] = 1
+
+    najpogostejse = []
+    for i in kazni_m:
+        if type(kazni_m[i]) == int:
+            najpogostejse.append((kazni_m[i], i))
+
+    print([kazni[j] for i, j in sorted(najpogostejse, reverse=True)[:20]])
 
 
 def kazni_distrikt():
@@ -316,9 +338,9 @@ def kazni_distrikt():
 
     kazni_pop = []
 
-    for kazni in [kazni_2014, kazni_2015, kazni_2016]:
+    for kazni_l in [kazni_2014, kazni_2015, kazni_2016]:
         kazni_leto = []
-        for ime, kazni, pop in zip(districts, kazni, pop_district):
+        for ime, kazni, pop in zip(districts, kazni_l, pop_district):
             kazni_leto.append(kazni/pop)
         kazni_pop.append(kazni_leto)
 
