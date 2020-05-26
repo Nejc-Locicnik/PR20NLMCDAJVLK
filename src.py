@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib
 import pandas as pd
+import geoplot as gplt
 import geopandas as gpd
 import matplotlib.pyplot as plt
 from pandas.plotting import register_matplotlib_converters
@@ -244,12 +245,11 @@ def najvec_kazni():
         if type(x[i]) == int:
             najpogostejse.append((x[i], i))
     plt.rcParams.update({'figure.autolayout': True})
-
     plt.barh([kazne[j] for i, j in sorted(najpogostejse, reverse=True)[:20]],
              [i for i, j in sorted(najpogostejse, reverse=True)[:20]])
     plt.title("Število tipa kazni")
-    plt.xlabel('Tip kazne')
-    plt.ylabel('Število kazni')
+    plt.ylabel('Tip kazni')
+    plt.xlabel('Število kazni')
     # plt.xticks(rotation=90)
     # plt.gcf().subplots_adjust(bottom=0.4)
     plt.show()
