@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib
 import pandas as pd
+import geopandas as gpd
 import matplotlib.pyplot as plt
 from pandas.plotting import register_matplotlib_converters
 register_matplotlib_converters()
@@ -231,6 +232,9 @@ def najvec_kazni():
     x = kazne.copy()
     for i in dataset["Violation Code"]:
         if i in kazne:
+            # kodi 38 in 69 predstavljata enak prekršek
+            if i == 38:
+                i = 69
             try:
                 x[i] += 1
             except:
