@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib
 import pandas as pd
+import geoplot as gplt
+import geopandas as gpd
 import matplotlib.pyplot as plt
 from pandas.plotting import register_matplotlib_converters
 register_matplotlib_converters()
@@ -231,6 +233,9 @@ def najvec_kazni():
     x = kazne.copy()
     for i in dataset["Violation Code"]:
         if i in kazne:
+            # kodi 38 in 69 predstavljata enak prekršek
+            if i == 38:
+                i = 69
             try:
                 x[i] += 1
             except:
@@ -240,12 +245,11 @@ def najvec_kazni():
         if type(x[i]) == int:
             najpogostejse.append((x[i], i))
     plt.rcParams.update({'figure.autolayout': True})
-
     plt.barh([kazne[j] for i, j in sorted(najpogostejse, reverse=True)[:20]],
              [i for i, j in sorted(najpogostejse, reverse=True)[:20]])
     plt.title("Število tipa kazni")
-    plt.xlabel('Tip kazne')
-    plt.ylabel('Število kazni')
+    plt.ylabel('Tip kazni')
+    plt.xlabel('Število kazni')
     # plt.gcf().subplots_adjust(bottom=0.4)
     plt.show()
 
@@ -284,20 +288,22 @@ def tip_kazni_distrikt():
     for i, j in zip(vrste_kazni["CODE"], vrste_kazni["DEFINITION"]):
         kazni[i] = trans(j)     # klice se prevod
 
-    kazni_m = kazni.copy()
+    kazni_distrikt = kazni.copy()
     for ticket in dataset["Violation Code"]:
         if ticket in kazni:
+            if ticket == 38:
+                ticket = 69
             try:
-                kazni_m[ticket] += 1
+                kazni_distrikt[ticket] += 1
             except:
-                kazni_m[ticket] = 1
+                kazni_distrikt[ticket] = 1
 
     najpogostejse = []
-    for i in kazni_m:
-        if type(kazni_m[i]) == int:
-            najpogostejse.append((kazni_m[i], i))
+    for i in kazni_distrikt:
+        if type(kazni_distrikt[i]) == int:
+            najpogostejse.append((kazni_distrikt[i], i))
 
-    print([kazni[j] for i, j in sorted(najpogostejse, reverse=True)[:20]])
+    print([kazni[j] for i, j in sorted(najpogostejse, reverse=True)[:3]])
 
 
 def kazni_distrikt():
