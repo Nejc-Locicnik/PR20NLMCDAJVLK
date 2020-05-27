@@ -5,22 +5,24 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from geopy.geocoders import Nominatim
 from pandas.plotting import register_matplotlib_converters
+
+
 register_matplotlib_converters()
 
 
 # FULL DATASETS:
-file_2014 = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2014__August_2013___June_2014_.csv'
-file_2015 = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2015.csv'
-file_2016 = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2016.csv'
-file_2017 = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2017.csv'
+file_2014 = '../podatki/Parking_Violations_Issued_-_Fiscal_Year_2014__August_2013___June_2014_.csv'
+file_2015 = '../podatki/Parking_Violations_Issued_-_Fiscal_Year_2015.csv'
+file_2016 = '../podatki/Parking_Violations_Issued_-_Fiscal_Year_2016.csv'
+file_2017 = '../podatki/Parking_Violations_Issued_-_Fiscal_Year_2017.csv'
 
 # SAMPLE DATASETS:
-file_2014_small = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2014__August_2013___June_2014__small.csv'
-file_2015_small = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2015_small.csv'
-file_2016_small = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2016_small.csv'
-file_2017_small = 'podatki/Parking_Violations_Issued_-_Fiscal_Year_2017_small.csv'
+file_2014_small = '../podatki/Parking_Violations_Issued_-_Fiscal_Year_2014__August_2013___June_2014__small.csv'
+file_2015_small = '../podatki/Parking_Violations_Issued_-_Fiscal_Year_2015_small.csv'
+file_2016_small = '../podatki/Parking_Violations_Issued_-_Fiscal_Year_2016_small.csv'
+file_2017_small = '../podatki/Parking_Violations_Issued_-_Fiscal_Year_2017_small.csv'
 
-# tabela polnih imen znamk - po potrebi se lahko se dodajo
+# tabela polnih imen znamk
 makes_full_names = np.flipud(np.array([
     ["MITSUBISHI", "MITSU"],
     ["MERCURY", "MERCU"],
@@ -38,22 +40,22 @@ makes_full_names = np.flipud(np.array([
 
 
 def main():
-    # kazni_datum_group_teden()
-    # kazni_dan_v_tednu()
-    # kazni_proizvajalec_abs()
-    # kazni_proizvajalec_rel()  # pravilno delujoče zgolj za file_2014
+    kazni_datum_group_teden()
+    kazni_dan_v_tednu()
+    kazni_proizvajalec_abs()
+    kazni_proizvajalec_rel()  # pravilno delujoče zgolj za file_2014
 
-    # preberi_kazne()
-    # najvec_kazni()
-    # stevilo_denarjaOdKazni()
+    preberi_kazne()
+    najvec_kazni()
+    stevilo_denarjaOdKazni()
 
-    # kazni_leto_na_prebivalca()
-    # kazni_distrikt()
-    # tip_kazni_distrikt()
-    # kazni_po_urah()
-    priporocilni_sistem()
+    kazni_leto_na_prebivalca()
+    kazni_distrikt()
+    tip_kazni_distrikt()
+    kazni_po_urah()
 
     # long_lat_to_csv(dataset, 'test.csv')
+
 
 def beri_dataset(filename):
     """ BRANJE IN PARSANJE DATUMOV V DATETIME: """
@@ -76,67 +78,7 @@ def beri_dataset(filename):
         dataset = pd.concat([dataset, chunk], ignore_index=True)
     return dataset
 
-
 dataset = beri_dataset(file_2014_small)
-
-def priporocilni_sistem():
-    """ PRIPOROČI NAJBOLJŠO LOKACIJO ZA ILEGALNO PARKIRANJE V BLIŽINI """
-
-    # preberemo kordinate kazni in jih shranimo v spremenljivko "kordinati"
-    with open("podatki/koordinate.txt", 'r') as file:
-        koordinati = []
-        for line in file:
-            lati, long = line.split(",")
-            lati = float(lati)
-            long = float(long)
-            if 40.4 < lati and lati < 41:
-                if -74.3 < long and long < -73.7:
-                    koordinati.append((long, lati))
-
-    # inicializiramo 60x60 2d list, kjer bomo hranili število kazni na posameznem kvadratku:
-    case_grid = [[0 for col in range(60)] for row in range(60)]
-
-    # napolnimo kvadratke z številom kazni
-    for cord in koordinati:
-        long_indx = round(float(cord[0] - (-74.3)) * 100) - 1
-        lati_indx = round(float(cord[1] - 40.4) * 100) - 1
-        case_grid[long_indx][lati_indx] += 1
-
-    # uporabnika povprašamo o trenutni lokaciji:
-    curr_addr = input("vnesite trenutni naslov v NYC: ")
-    geolocator = Nominatim(user_agent="test")
-    loc = geolocator.geocode(curr_addr + ',' + 'New York City, USA')
-    # če uporabnik vnese ne veljavno lokacijo:
-    if (loc is None):
-        print('Ni podatkov o tej lokaciji')
-    # če uporabnik vnese veljavno lokacijo:
-    else:
-        curr_addr_cord = [loc.longitude, loc.latitude]
-        # izračunamo indekse kvadratka trenutne lokacije:
-        curr_addr_long_indx = round(float(curr_addr_cord[0] - (-74.3)) * 100) - 1
-        curr_addr_lati_indx = round(float(curr_addr_cord[1] - 40.4) * 100) - 1
-        # nastavimo best score in best index na naslov kjer se trenutno nahajamo:
-        best_score = case_grid[curr_addr_long_indx][curr_addr_lati_indx]
-        best_indx = [curr_addr_long_indx, curr_addr_lati_indx]
-
-        for i in range (curr_addr_long_indx - 1, curr_addr_long_indx + 1):
-            for j in range (curr_addr_lati_indx - 1, curr_addr_lati_indx + 1):
-                # da ne gledamo še 1x istega kordinate kjer se nahajamo trenutno:
-                if i != curr_addr_long_indx or j != curr_addr_lati_indx:
-                    # če dobimo boljšo lokacijo shranimo boljši score in indeks najboljšega scora:
-                    if case_grid[i][j] * 1.2 < best_score:
-                        best_score = case_grid[i][j]
-                        best_indx = [i, j]
-
-
-        # index nazaj v kordinate:
-        best_long_cord = float((best_indx[0] + 1) / 100 - 74.3)
-        best_lati_cord = float((best_indx[1] + 1) / 100 + 40.4)
-        lat_long = f'{best_lati_cord}, {best_long_cord}'
-        if curr_addr_long_indx == best_indx[0] and curr_addr_lati_indx == best_indx[1]:
-            print('nahajate se na najboljši lokaciji za ilegalno parkiranje v svoji bližini')
-        else:
-            print('Najboljša lokacija za ilegalno parkiranje v tvoji bližini je:', geolocator.reverse(lat_long))
 
 def long_lat_to_csv(dataset, output_file):
     """ DODA LONGITUDE IN LATITUDE DATASETU TER EXPORTA V NOV CSV """
@@ -166,115 +108,8 @@ def long_lat_to_csv(dataset, output_file):
                 # da funkciji ni potrebno večkrat preverjat naslovou, ki vrnejo None
                 longlat[address] = None
     
-    out = './podatki/' + output_file
+    out = '../podatki/' + output_file
     dataset.to_csv(out, index=False)
-
-def kazni_datum_group_teden():
-    """ GRAF ŠTEVILA KAZNI PO DATUMIH: """
-
-    date_count = dataset.groupby(dataset['Issue Date'])['Issue Date'].agg(['count'])
-    # Issue date postane nazaj column in ne index:
-    date_count = date_count.reset_index()
-    # vsem datumom odštejemo 7 dni ker jih bomo groupirali, tako da bo group veljal za 7 dni naprej in ne 7 dni nazaj:
-    date_count['Issue Date'] = pd.to_datetime(date_count['Issue Date']) - pd.to_timedelta(7, unit='d')
-    # grupiramo vsak teden in seštejemo število kazni v tistem tednu:
-    date_count = date_count.groupby([pd.Grouper(key='Issue Date', freq='W-MON')])['count'].sum().reset_index()
-    # filtriranje datumov, ki ne bi smeli obstajati:
-    date_count = date_count[(date_count['Issue Date'] > '2013-07-25') & (date_count['Issue Date'] < '2014-06-20')]
-    # "Issue Date" nazaj v index dataframa:
-    date_count = date_count.set_index('Issue Date')
-    # izris:
-    plt.rcParams.update({'figure.autolayout': True})
-    plt.plot(date_count)
-    plt.ylim(bottom=0)
-    plt.title("Število napisanih kazni 2013/2014")
-    plt.xlabel('Datum')
-    plt.xticks(rotation=90)
-    plt.ylabel('Št. parkirnih kazni')
-    plt.show()
-
-
-def kazni_dan_v_tednu():
-    """ KAZNI GLEDE NA DAN V TEDNU: """
-
-    weekday_count = dataset.groupby(dataset['Issue Date'].dt.dayofweek).agg('count')['Issue Date']
-    # izris:
-    plt.rcParams.update({'figure.autolayout': True})
-    plt.bar(np.array(['pon', 'tor', 'sre', 'čet', 'pet', 'sob', 'ned']), weekday_count)
-    plt.title("Kazni glede na dan v tednu 2013/2014")
-    plt.xlabel('Dan v tednu')
-    plt.ylabel('Skupno št. parkirnih kazni')
-    plt.show()
-
-
-def kazni_proizvajalec_abs():
-    """ KAZNI GLEDE NA PROIZVAJALCA AVTOMOBILA (ABSOLUTNO) """
-
-    vehicle_make_count = dataset.groupby(['Vehicle Make'])['Vehicle Make'].agg('count')
-    # sortarinje padajoče:
-    vehicle_make_count = vehicle_make_count.sort_values(ascending=False)
-    top_vehicle_make = vehicle_make_count.head(20)
-
-    # polna imena
-    top_vehicle_make = top_vehicle_make.rename({b: a for a, b in makes_full_names})
-
-    top_vehicle_make.plot.barh(top_vehicle_make)
-
-    # izris:
-    plt.rcParams.update({'figure.autolayout': True})
-    plt.title("Absolutno število kazni glede na proizvajalca avtomobila 2013/2014")
-    plt.xlabel('Število kazni')
-    plt.ylabel('Proizvajalec')
-    plt.show()
-
-
-def kazni_proizvajalec_rel():
-    """ KAZNI GLEDE NA PROIZVAJALCA AVTOMOBILA (RELATIVNO) """
-
-    vehicle_make_count_r = dataset.groupby(['Vehicle Make'])['Vehicle Make'].agg('count')
-    # vehicle_make_count_r = vehicle_make_count_r.sort_values(ascending=False)
-    vehicle_make_count_r = vehicle_make_count_r.sort_values(ascending=False)
-    top_vehicle_make_r = vehicle_make_count_r.head(20)
-    top_vehicle_make_r = top_vehicle_make_r.to_frame()
-    # 2014 market share (https://www.goodcarbadcar.net/december-2014-usa-autosales-brand-results-rankings/)
-    shares = np.array([
-        14.4,  # FORD
-        12.1,  # TOYOT
-        8.3,  # HONDA
-        12.3,  # CHEVR
-        7.7,  # NISSA
-        3.5,  # DODGE
-        3.0,  # GMC
-        2.2,  # ME/BE
-        1.0,  # FRUEH (Fruehauf)                - NO DATA
-        1.0,  # INTER (International Harvester) - NO DATA
-        2.1,  # BMW
-        4.2,  # JEEP
-        4.4,  # HYUND
-        1.9,  # LEXUS
-        1.0,  # ACURA
-        2.2,  # VOLKS
-        1.9,  # CHRYS
-        0.6,  # LINCO
-        0.5,  # MITSU
-        0.7]  # INFIN
-    )
-    top_vehicle_make_r = top_vehicle_make_r.assign(share=shares)
-    top_vehicle_make_r['Relative'] = top_vehicle_make_r['Vehicle Make'] / top_vehicle_make_r.share
-    top_vehicle_make_r = top_vehicle_make_r.sort_values('Relative', ascending=False)
-
-    # polna imena
-    top_vehicle_make_r = top_vehicle_make_r.rename({b: a for a, b in makes_full_names})
-
-    # izris:
-    plt.rcParams.update({'figure.autolayout': True})
-
-    plt.barh(top_vehicle_make_r.index, top_vehicle_make_r['Relative'])
-    plt.title("Relativno število kazni glede na proizvajalca avtomobila 2013/2014")
-    plt.xlabel('Število kazni')
-    plt.ylabel('Proizvajalec')
-    plt.show()
-
 
 def trans(tip):
     # po potrebi se se lahko dodajo
@@ -309,17 +144,123 @@ def trans(tip):
     return tip
 
 
+""" ------------ VIZUALIZACIJE: ------------ """
+
+
+def kazni_datum_group_teden():
+    """ GRAF ŠTEVILA KAZNI PO DATUMIH: """
+
+    date_count = dataset.groupby(dataset['Issue Date'])['Issue Date'].agg(['count'])
+    # Issue date postane nazaj column in ne index:
+    date_count = date_count.reset_index()
+    # vsem datumom odštejemo 7 dni ker jih bomo groupirali, tako da bo group veljal za 7 dni naprej in ne 7 dni nazaj:
+    date_count['Issue Date'] = pd.to_datetime(date_count['Issue Date']) - pd.to_timedelta(7, unit='d')
+    # grupiramo vsak teden in seštejemo število kazni v tistem tednu:
+    date_count = date_count.groupby([pd.Grouper(key='Issue Date', freq='W-MON')])['count'].sum().reset_index()
+    # filtriranje datumov, ki ne bi smeli obstajati:
+    date_count = date_count[(date_count['Issue Date'] > '2013-07-25') & (date_count['Issue Date'] < '2014-06-20')]
+    # "Issue Date" nazaj v index dataframa:
+    date_count = date_count.set_index('Issue Date')
+    # izris:
+    plt.rcParams.update({'figure.autolayout': True})
+    plt.plot(date_count)
+    plt.ylim(bottom=0)
+    plt.title("Število napisanih kazni 2013/2014")
+    plt.xlabel('Datum')
+    plt.xticks(rotation=90)
+    plt.ylabel('Št. parkirnih kazni')
+    plt.show()
+
+def kazni_dan_v_tednu():
+    """ KAZNI GLEDE NA DAN V TEDNU: """
+
+    weekday_count = dataset.groupby(dataset['Issue Date'].dt.dayofweek).agg('count')['Issue Date']
+    # izris:
+    plt.rcParams.update({'figure.autolayout': True})
+    plt.bar(np.array(['pon', 'tor', 'sre', 'čet', 'pet', 'sob', 'ned']), weekday_count)
+    plt.title("Kazni glede na dan v tednu 2013/2014")
+    plt.xlabel('Dan v tednu')
+    plt.ylabel('Skupno št. parkirnih kazni')
+    plt.show()
+
+def kazni_proizvajalec_abs():
+    """ KAZNI GLEDE NA PROIZVAJALCA AVTOMOBILA (ABSOLUTNO) """
+
+    vehicle_make_count = dataset.groupby(['Vehicle Make'])['Vehicle Make'].agg('count')
+    # sortarinje padajoče:
+    vehicle_make_count = vehicle_make_count.sort_values(ascending=False)
+    top_vehicle_make = vehicle_make_count.head(20)
+
+    # polna imena
+    top_vehicle_make = top_vehicle_make.rename({b: a for a, b in makes_full_names})
+
+    top_vehicle_make.plot.barh(top_vehicle_make)
+
+    # izris:
+    plt.rcParams.update({'figure.autolayout': True})
+    plt.title("Absolutno število kazni glede na proizvajalca avtomobila 2013/2014")
+    plt.xlabel('Število kazni')
+    plt.ylabel('Proizvajalec')
+    plt.show()
+
+def kazni_proizvajalec_rel():
+    """ KAZNI GLEDE NA PROIZVAJALCA AVTOMOBILA (RELATIVNO) """
+
+    vehicle_make_count_r = dataset.groupby(['Vehicle Make'])['Vehicle Make'].agg('count')
+    # vehicle_make_count_r = vehicle_make_count_r.sort_values(ascending=False)
+    vehicle_make_count_r = vehicle_make_count_r.sort_values(ascending=False)
+    top_vehicle_make_r = vehicle_make_count_r.head(20)
+    top_vehicle_make_r = top_vehicle_make_r.to_frame()
+    # 2014 market share (https://www.goodcarbadcar.net/december-2014-usa-autosales-brand-results-rankings/)
+    shares = np.array([
+        14.4,  # FORD
+        12.1,  # TOYOT
+        8.3,  # HONDA
+        12.3,  # CHEVR
+        7.7,  # NISSA
+        3.5,  # DODGE
+        3.0,  # GMC
+        2.2,  # ME/BE
+        1.0,  # FRUEH (Fruehauf)                - NO RELIABLE DATA
+        1.0,  # INTER (International Harvester) - NO RELIABLE DATA
+        2.1,  # BMW
+        4.2,  # JEEP
+        4.4,  # HYUND
+        1.9,  # LEXUS
+        1.0,  # ACURA
+        2.2,  # VOLKS
+        1.9,  # CHRYS
+        0.6,  # LINCO
+        0.5,  # MITSU
+        0.7]  # INFIN
+    )
+    top_vehicle_make_r = top_vehicle_make_r.assign(share=shares)
+    top_vehicle_make_r['Relative'] = top_vehicle_make_r['Vehicle Make'] / top_vehicle_make_r.share
+    top_vehicle_make_r = top_vehicle_make_r.sort_values('Relative', ascending=False)
+
+    # polna imena
+    top_vehicle_make_r = top_vehicle_make_r.rename({b: a for a, b in makes_full_names})
+
+    # izris:
+    plt.rcParams.update({'figure.autolayout': True})
+
+    plt.barh(top_vehicle_make_r.index, top_vehicle_make_r['Relative'])
+    plt.title("Relativno število kazni glede na proizvajalca avtomobila 2013/2014")
+    plt.xlabel('Število kazni')
+    plt.ylabel('Proizvajalec')
+    plt.show()
+
+
 kazne = {}
 denar = {}
 
 
 def preberi_kazne():
-    tipKazne = pd.read_csv("podatki/DOF_Parking_Violation_Codes.csv")
+    tipKazne = pd.read_csv("../podatki/DOF_Parking_Violation_Codes.csv")
     for i, j in zip(tipKazne["CODE"], tipKazne["DEFINITION"]):
         kazne[i] = trans(j) # klice se prevod
     for i, j in zip(tipKazne["CODE"], tipKazne["All Other Areas"]):
         denar[i] = j
-
 
 def najvec_kazni():
     """ KATERE KAZNE SO NAJPOGOSTEJSE """
@@ -346,14 +287,12 @@ def najvec_kazni():
     # plt.gcf().subplots_adjust(bottom=0.4)
     plt.show()
 
-
 def stevilo_denarjaOdKazni():
     steviloDenara = 0
     for i in dataset["Violation Code"]:
         if int(i) in denar.keys():
             steviloDenara += int(denar[i])
     print("Skupno število denarja pridobljenega od vseh kazni: {e}$".format(e=steviloDenara))
-
 
 def kazni_leto_na_prebivalca():
     """ ŠT. KAZNI PO LETIH """
@@ -373,11 +312,10 @@ def kazni_leto_na_prebivalca():
     plt.show()
     # spike leta 2015, mogoce kaksen razlog
 
-
 def tip_kazni_distrikt():
     kazni = {}
 
-    vrste_kazni = pd.read_csv("podatki/DOF_Parking_Violation_Codes.csv")
+    vrste_kazni = pd.read_csv("../podatki/DOF_Parking_Violation_Codes.csv")
     for i, j in zip(vrste_kazni["CODE"], vrste_kazni["DEFINITION"]):
         kazni[i] = trans(j)     # klice se prevod
 
@@ -462,7 +400,6 @@ def tip_kazni_distrikt():
         - Brez parkirnega listka 	            :  490746
         - Dvojno parkiranje 	                :  322582
     """
-
 
 def kazni_distrikt():
     """
