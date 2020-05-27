@@ -33,7 +33,7 @@ Kot osvnovi nabor podatkov smo izbrali ogromno podatkovno bazo parkirnih kazni v
 
 Skupaj predstavljajo do 51 atributov (odvisno od leta). Našo osnovo bomo po potrebi tudi dopolnjevali s pomožnimi podatki za normalizacijo ali primerjavo.
 
-### Osnovne vizualizacije
+### Osnovne vizualizacije <a class="anchor" id="osnovne_viz"></a>
 _______________________
 Za začetek smo za boljše razumevanje podatkov in kaj vse lahko z njimi naredimo vizualizirali nekaj osnovnih porazdalitev.
 
