@@ -38,19 +38,20 @@ makes_full_names = np.flipud(np.array([
 
 
 def main():
-    #kazni_datum_group_teden()
-    #kazni_dan_v_tednu()
-    #kazni_proizvajalec_abs()
-    #kazni_proizvajalec_rel()  # pravilno delujoče zgolj za file_2014
+    # kazni_datum_group_teden()
+    # kazni_dan_v_tednu()
+    # kazni_proizvajalec_abs()
+    # kazni_proizvajalec_rel()  # pravilno delujoče zgolj za file_2014
 
-    #preberi_kazne()
-    #najvec_kazni()
-    #stevilo_denarjaOdKazni()
+    # preberi_kazne()
+    # najvec_kazni()
+    # stevilo_denarjaOdKazni()
 
-    #kazni_leto_na_prebivalca()
-    #kazni_distrikt()
-    #tip_kazni_distrikt()
-    kazni_po_urah()
+    # kazni_leto_na_prebivalca()
+    # kazni_distrikt()
+    # tip_kazni_distrikt()
+    # kazni_po_urah()
+    priporocilni_sistem()
 
     # long_lat_to_csv(dataset, 'test.csv')
 
@@ -78,10 +79,68 @@ def beri_dataset(filename):
 
 dataset = beri_dataset(file_2014)
 
+def priporocilni_sistem():
+    """ PRIPOROČI NAJBOLJŠO LOKACIJO ZA ILEGALNO PARKIRANJE V BLIŽINI """
+
+    # preberemo kordinate kazni in jih shranimo v spremenljivko "kordinati"
+    with open("podatki/koordinate.txt", 'r') as file:
+        koordinati = []
+        for line in file:
+            lati, long = line.split(",")
+            lati = float(lati)
+            long = float(long)
+            if 40.4 < lati and lati < 41:
+                if -74.3 < long and long < -73.7:
+                    koordinati.append((long, lati))
+
+    # inicializiramo 60x60 2d list, kjer bomo hranili število kazni na posameznem kvadratku:
+    case_grid = [[0 for col in range(60)] for row in range(60)]
+
+    # napolnimo kvadratke z številom kazni
+    for cord in koordinati:
+        long_indx = round(float(cord[0] - (-74.3)) * 100) - 1
+        lati_indx = round(float(cord[1] - 40.4) * 100) - 1
+        case_grid[long_indx][lati_indx] += 1
+
+    # uporabnika povprašamo o trenutni lokaciji:
+    curr_addr = input("vnesite trenutni naslov v NYC: ")
+    geolocator = Nominatim(user_agent="test")
+    loc = geolocator.geocode(curr_addr + ',' + 'New York City, USA')
+    # če uporabnik vnese ne veljavno lokacijo:
+    if (loc is None):
+        print('Ni podatkov o tej lokaciji')
+    # če uporabnik vnese veljavno lokacijo:
+    else:
+        curr_addr_cord = [loc.longitude, loc.latitude]
+        # izračunamo indekse kvadratka trenutne lokacije:
+        curr_addr_long_indx = round(float(curr_addr_cord[0] - (-74.3)) * 100) - 1
+        curr_addr_lati_indx = round(float(curr_addr_cord[1] - 40.4) * 100) - 1
+        # nastavimo best score in best index na naslov kjer se trenutno nahajamo:
+        best_score = case_grid[curr_addr_long_indx][curr_addr_lati_indx]
+        best_indx = [curr_addr_long_indx, curr_addr_lati_indx]
+
+        for i in range (curr_addr_long_indx - 1, curr_addr_long_indx + 1):
+            for j in range (curr_addr_lati_indx - 1, curr_addr_lati_indx + 1):
+                # da ne gledamo še 1x istega kordinate kjer se nahajamo trenutno:
+                if i != curr_addr_long_indx or j != curr_addr_lati_indx:
+                    # če dobimo boljšo lokacijo shranimo boljši score in indeks najboljšega scora:
+                    if case_grid[i][j] * 1.2 < best_score:
+                        best_score = case_grid[i][j]
+                        best_indx = [i, j]
+
+
+        # index nazaj v kordinate:
+        best_long_cord = float((best_indx[0] + 1) / 100 - 74.3)
+        best_lati_cord = float((best_indx[1] + 1) / 100 + 40.4)
+        lat_long = f'{best_lati_cord}, {best_long_cord}'
+        if curr_addr_long_indx == best_indx[0] and curr_addr_lati_indx == best_indx[1]:
+            print('nahajate se na najboljši lokaciji za ilegalno parkiranje v svoji bližini')
+        else:
+            print('Najboljša lokacija za ilegalno parkiranje v tvoji bližini je:', geolocator.reverse(lat_long))
+
 def long_lat_to_csv(dataset, output_file):
     """ DODA LONGITUDE IN LATITUDE DATASETU TER EXPORTA V NOV CSV """
     
-    print("function is on")
     # privzeta vrednost:
     dataset['longitude'] = None
     dataset['latitude'] = None
@@ -90,7 +149,7 @@ def long_lat_to_csv(dataset, output_file):
     area = "New York City, USA"
     for i, row in dataset.iterrows():
         if int(i) % 10 == 0:
-            print('vrstica:', i)
+            print('trenutna vrstica:', i)
         address = row['Street Name']
         try:
             # če je naslov že v slovarju:
@@ -352,11 +411,9 @@ def tip_kazni_distrikt():
     }
     
     for d in dist_codes:
-
         dataset_d = dataset[(dataset['Violation County'] == dist_codes[d][0]) |
                             (dataset['Violation County'] == dist_codes[d][1]) |
                             (dataset['Violation County'] == dist_codes[d][2])]
-
         kazni_d = kazni.copy()
         for ticket in dataset_d["Violation Code"]:
             if ticket in kazni:
@@ -366,15 +423,12 @@ def tip_kazni_distrikt():
                     kazni_d[ticket] += 1
                 except:
                     kazni_d[ticket] = 1
-
         najpogostejse = []
         for i in kazni_d:
             if type(kazni_d[i]) == int:
                 najpogostejse.append((kazni_d[i], i))
-
         najpogostejse_3 = [kazni[j] for i, j in sorted(najpogostejse, reverse=True)[:3]]
         najpogostejse_3_st = [kazni_d[j] for i, j in sorted(najpogostejse, reverse=True)[:3]]
-
         print('Najpogostejše kazni za {}:'.format(d))
         for k, st in zip(najpogostejse_3, najpogostejse_3_st):
             print('\t-',k,'\t: ', st)
