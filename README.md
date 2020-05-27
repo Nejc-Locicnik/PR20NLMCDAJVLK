@@ -12,14 +12,12 @@ ____________
 * Luka Kalezić
 
 ### Kazalo
-* [Uvod](#uvod)
+__________________
 * [Izbor in oblika podatkov](#izbor_oblika_pod)
 * [Osnovne vizualizacije](#osnovne_viz)
 * [Vizualizacije zemljevida](#map_viz)
 * [Priporočilni sistem](#prip_sistem)
 * [Problemi](#problemi)
-
-### Uvod <a class="anchor" id="uvod"></a>
 
 ### Izbor in oblika podatkov <a class="anchor" id="izbor_oblika_pod"></a>
 ____________
@@ -39,9 +37,11 @@ Skupaj predstavljajo do 51 atributov (odvisno od leta). Našo osnovo bomo po pot
 _______________________
 Za začetek smo za boljše razumevanje podatkov in kaj vse lahko z njimi naredimo vizualizirali nekaj osnovnih porazdalitev.
 
+Kot pričakovano je med delovnimi dnevi porazdelitev kazni skoraj enakakomerna, medtem ko je med vikendi zaradi manj prometa seveda nižja.
+
 ![slika](slike/kazni_po_dnevih.png)
 
-![slika](slike/tip_kazni_porazdelitev.png)
+Porazdelitev firm avtomobilov tudi ni preveč presenetljiva, vrh in skoraj polovico seznama zasedajo ameriške firme, ostalo si pa delijo popularne evropejske in azijske firme.
 
 ![slika](slike/firma_avta_porazdelitev.png)
 
@@ -49,19 +49,32 @@ Za začetek smo za boljše razumevanje podatkov in kaj vse lahko z njimi naredim
 
 ![slika](slike/kazni_cas_2014.png)
 
+// od jureta
+
+// barplot tipa kazni po letih
+
 ### Vizualizacije zemljevida <a class="anchor" id="map_viz"></a>
+__________________
+Nekaj kazni, ki se največkrat pojavijo in nekaj zanimivih (prekoračitev hitrosti v šolskih conah in neupoštevanje rdeče luči) smo z animacijo prikazali skozi leta na nivoju okrožij (boroughs). Prekoračitev hitrosti v šolskih conah in neupoštevanje rdeče luči lahko v prvih dveh letih (2013/2014 in 2015) ignorirate, saj jih niso vpisovali v to podatkovno bazo. Ob koncu 2015 pa so povečali število kamer za prekoračitev hitrosti v šolskih conah (http://www.nyc.gov/html/dot/downloads/pdf/speed-camera-report-june2018.pdf), tako da od takrat dalje tovrstna kazen vsako leto zraste. Ostale bolj popularne vrste kazni, kot so npr. prepovedano parkiranje, potečena ali manjkajoča nalepka itd. pa vidimo, da se bistveno ne spreminjajo skozi leta in ostajo v enakem razmerju med okrožji.
 
-![gif](slike/kazni_skozi_leta.gif =250x)
+![gif](slike/kazni_skozi_leta.gif)
 
-![slika](slike/heatmap.png =250x100)
+Pri drugi vizualizaciji pa smo poskusili pridobiti točne koordinate kazni glede na sestavljen naslov iz atributov hišne številke, ime ulice in ime okrožja. Tukaj smo naleteli na kar nekaj težav o katerih bomo več omenili na koncu. Sama prevedba z uporabo geopy (geocoders) je prepočasna za naših ~42M primerov, tako da smo to storili le za 10k primerov od katerih za ~30% ni dekodiralo lokacije.
+Spodnja slika je prikazana z uporaba Googlovega API-ja Geocoding.
+
+![slika](slike/heatmap.png)
 
 ### Priporočilni sistem <a class="anchor" id="prip_sistem"></a>
-
-Za priporočilni sistem smo se zanašali na koordinate (latitude, longitude), tako da nam ni preostalo druga kot uporaba koordinat, katere nam je uspelo dekodirati iz naslvov v podatkih (uporabljeni sicer za heatmap zgoraj). Ce jih se enkrat vizualiziramo zgledajo takole:
+__________________
+Priporočilnega sistema smo se lotili kar se da preprosto, a smo žal še vedno potrebovali lokacijo kazni v obliki koordinat (longitude, latitude), tako da smo se zanašali na samo ~7k koordinat iz zgornjega heatmap prikaza. Če jih še enkrat vizualiziramo zgledajo takole:
 
 ![slika](slike/base_priporocilo.PNG)
 
-![slika](slike/kvadratki.PNG =250x250)
+Nato smo celoten zemljevid razdelili na kvadratke (60x60), kot vidite na spodnji sliki in prešteli število kazni v vsakem.
+ 
+![slika](slike/kvadratki.PNG)
+
+Priporočilni sistem deluje tako, da uporabnik vnese naslov trenutne pozicije (lahko je točen naslov s hišno številko ali samo ulica npr. N/S WILLOUGHBY AVE), nato program izračuna kateremu kvadratku bi ta naslov pripadal in izbere sosednji kvadratek, ki vsebuje najmanj kazni pod pogojem, da ima manj kazni kot 80% jih vsebuje trenuten položaj. Izpiše naslov najboljše lokacije.
 
 ### Problemi <a class="anchor" id="problemi"></a>
 __________________
