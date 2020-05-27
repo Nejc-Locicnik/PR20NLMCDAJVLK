@@ -66,7 +66,7 @@ Nekaj kazni, ki se največkrat pojavijo in nekaj zanimivih (prekoračitev hitros
 Pri drugi vizualizaciji pa smo poskusili pridobiti točne koordinate kazni glede na sestavljen naslov iz atributov hišne številke, ime ulice in ime okrožja. Tukaj smo naleteli na kar nekaj težav o katerih bomo več omenili na koncu. Sama prevedba z uporabo geopy (geocoders) je prepočasna za naših ~42M primerov, tako da smo to storili le za 10k primerov od katerih za ~30% ni dekodiralo lokacije.
 Spodnja slika je prikazana z uporaba Googlovega API-ja Geocoding.
 
-![slika](slike/heatmap.png)
+![slika](slike/heatmap_no_watermark.png)
 
 ### Priporočilni sistem <a class="anchor" id="prip_sistem"></a>
 __________________
