@@ -1,8 +1,7 @@
 import numpy as np
 import matplotlib
+import datetime as dt
 import pandas as pd
-#import geoplot as gplt
-import geopandas as gpd
 import matplotlib.pyplot as plt
 from geopy.geocoders import Nominatim
 from pandas.plotting import register_matplotlib_converters
@@ -50,7 +49,8 @@ def main():
 
     #kazni_leto_na_prebivalca()
     #kazni_distrikt()
-    tip_kazni_distrikt()
+    #tip_kazni_distrikt()
+    kazni_po_urah()
 
     # long_lat_to_csv(dataset, 'test.csv')
 
@@ -76,7 +76,7 @@ def beri_dataset(filename):
     return dataset
 
 
-dataset = beri_dataset(file_2017_small)
+dataset = beri_dataset(file_2014)
 
 def long_lat_to_csv(dataset, output_file):
     """ DODA LONGITUDE IN LATITUDE DATASETU TER EXPORTA V NOV CSV """
@@ -447,6 +447,39 @@ def kazni_distrikt():
     plt.title("Število parkirnih kazni na prebivalca za posamezen distrikt")
     plt.ylabel('Št. kazni na preb.')
     plt.xlabel('Leto')
+    plt.show()
+
+def kazni_po_urah():
+    violation_time = pd.DataFrame(columns=['time', 'i'])
+
+    for i, cas in [(x, str(y)) for x, y in zip(dataset.index, dataset['Violation Time'])]:
+        #preverimo točnost podatkov, odstranimo napačne
+        if cas != "nan" and "+" not in cas and len(cas) == 5:
+            #dodamo M (format je npr. 0212A, pandas sprejema na koncu AM/PM)
+            cas += "M"
+            #print(cas)
+            if int(cas[0:2]) <= 12 and int(cas[2:4]) <= 59:
+                if cas[0:2] == "00":
+                    cas = "12" + cas[2::]
+                violation_time = violation_time.append(
+                    {'time': pd.to_datetime("01-01-2000 " + str(dt.datetime.strptime(cas, '%I%M%p').time())), 'i': i},
+                    ignore_index=True)
+
+    #spremenimo podatkovni tip stolpca v time in ga nastavimo kot indeks
+    violation_time = violation_time.set_index(["time"])
+    violation_time.index = pd.to_datetime(violation_time.index, unit='s')
+
+    #print(violation_time.to_string())
+
+    #naredimo intervale po 60 minut iz indeksov (časa)
+    grp = violation_time.resample('60min', base=0, label='right').count().reset_index()
+
+    #damo v string in izrišemo na grafu
+    grp['time'] = grp['time'].astype(str).str.slice(start=11)
+    grp.plot(kind="barh", x="time", y="i", legend=False)
+    plt.title("Absolutno število kazni glede na uro")
+    plt.xlabel('Število kazni')
+    plt.ylabel('Ura (zg. meja, interval 60 min)')
     plt.show()
 
 
