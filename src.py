@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib
 import pandas as pd
-import geoplot as gplt
+#import geoplot as gplt
 import geopandas as gpd
 import matplotlib.pyplot as plt
 from geopy.geocoders import Nominatim
@@ -39,17 +39,18 @@ makes_full_names = np.flipud(np.array([
 
 
 def main():
-    kazni_datum_group_teden()
-    kazni_dan_v_tednu()
-    kazni_proizvajalec_abs()
-    kazni_proizvajalec_rel()  # pravilno delujoče zgolj za file_2014
+    #kazni_datum_group_teden()
+    #kazni_dan_v_tednu()
+    #kazni_proizvajalec_abs()
+    #kazni_proizvajalec_rel()  # pravilno delujoče zgolj za file_2014
 
-    preberi_kazne()
-    najvec_kazni()
-    stevilo_denarjaOdKazni()
+    #preberi_kazne()
+    #najvec_kazni()
+    #stevilo_denarjaOdKazni()
 
-    kazni_leto_na_prebivalca()
-    kazni_distrikt()
+    #kazni_leto_na_prebivalca()
+    #kazni_distrikt()
+    tip_kazni_distrikt()
 
     # long_lat_to_csv(dataset, 'test.csv')
 
@@ -75,7 +76,7 @@ def beri_dataset(filename):
     return dataset
 
 
-dataset = beri_dataset(file_2016_small)
+dataset = beri_dataset(file_2017_small)
 
 def long_lat_to_csv(dataset, output_file):
     """ DODA LONGITUDE IN LATITUDE DATASETU TER EXPORTA V NOV CSV """
@@ -283,7 +284,6 @@ def najvec_kazni():
     plt.title("Število tipa kazni")
     plt.ylabel('Tip kazni')
     plt.xlabel('Število kazni')
-    # plt.xticks(rotation=90)
     # plt.gcf().subplots_adjust(bottom=0.4)
     plt.show()
 
@@ -315,29 +315,106 @@ def kazni_leto_na_prebivalca():
     # spike leta 2015, mogoce kaksen razlog
 
 
+def tip_kazni_distrikt():
+    kazni = {}
+
+    vrste_kazni = pd.read_csv("podatki/DOF_Parking_Violation_Codes.csv")
+    for i, j in zip(vrste_kazni["CODE"], vrste_kazni["DEFINITION"]):
+        kazni[i] = trans(j)     # klice se prevod
+
+    districts = ['Staten Island', 'Bronx', 'Queens', 'Manhattan', 'Brooklyn']
+    naj_kazni = ['Omejena hitrost šolske cone ', 'Prepovedano parkiranje - čiščenje', 'Omejena hitrost šolske cone',
+                 'Prepovedano parkiranje', 'Prepovedano parkiranje - čiščenje ']
+    naj_kazni_st = [94353, 229127, 449390, 520205, 661350]
+
+    # Izris - najboljse na full screen
+    plt.rcParams.update({'figure.autolayout': True})
+    for i in reversed(range(5)):
+        plt.barh(naj_kazni[i], naj_kazni_st[i], label=districts[i])
+    handles, labels = plt.gca().get_legend_handles_labels()
+    legend_order = [4, 3, 2, 1, 0]
+    plt.legend([handles[idx] for idx in legend_order], [labels[idx] for idx in legend_order], prop={'size': 19})
+    plt.title("Najpogostejša kazen posameznega distrikta - 2017", fontsize=20)
+    plt.ylabel('Tip kazni', fontsize=15)
+    plt.tick_params(axis='y', labelsize=15)
+    plt.xlabel('Število kazni', fontsize=15)
+    plt.tick_params(axis='x', labelsize=13)
+    plt.show()
+
+    # Koda za izracun st. kazni
+    """
+    dist_codes = {
+        'Staten Island': ["ST", "R", ""],
+        'Bronx': ["BRONX", "BX", ""],
+        'Queens': ["Q", "QN", "QNS"],
+        'Brooklyn': ["BK", "K", "KINGS"],
+        'Manhattan': ["MN", "NY", ""]
+    }
+    
+    for d in dist_codes:
+
+        dataset_d = dataset[(dataset['Violation County'] == dist_codes[d][0]) |
+                            (dataset['Violation County'] == dist_codes[d][1]) |
+                            (dataset['Violation County'] == dist_codes[d][2])]
+
+        kazni_d = kazni.copy()
+        for ticket in dataset_d["Violation Code"]:
+            if ticket in kazni:
+                if ticket == 38:
+                    ticket = 69
+                try:
+                    kazni_d[ticket] += 1
+                except:
+                    kazni_d[ticket] = 1
+
+        najpogostejse = []
+        for i in kazni_d:
+            if type(kazni_d[i]) == int:
+                najpogostejse.append((kazni_d[i], i))
+
+        najpogostejse_3 = [kazni[j] for i, j in sorted(najpogostejse, reverse=True)[:3]]
+        najpogostejse_3_st = [kazni_d[j] for i, j in sorted(najpogostejse, reverse=True)[:3]]
+
+        print('Najpogostejše kazni za {}:'.format(d))
+        for k, st in zip(najpogostejse_3, najpogostejse_3_st):
+            print('\t-',k,'\t: ', st)
+        print('\n')
+    """
+
+    # Izpis za file_2017:
+    """
+    Najpogostejše kazni za Staten Island:
+        - Omejena hitrost šolske cone 	        :  94353
+        - Neupoštevanje rdeče luči 	            :  40678
+        - Potečena ali manjkajoča nalepka 	    :  34469
+        
+    Najpogostejše kazni za Bronx:
+        - Prepovedano parkiranje - čiščenje 	:  229127
+        - Omejena hitrost šolske cone 	        :  184758
+        - Brez parkirnega listka 	            :  130188
+        
+    Najpogostejše kazni za Queens:
+        - Omejena hitrost šolske cone 	        :  449390
+        - Prepovedano parkiranje - čiščenje 	:  341380
+        - Brez parkirnega listka 	            :  309189
+        
+    Najpogostejše kazni za Brooklyn:
+        - Prepovedano parkiranje - čiščenje 	:  661350
+        - Omejena hitrost šolske cone 	        :  637201
+        - Brez parkirnega listka 	            :  298052
+        
+    Najpogostejše kazni za Manhattan:
+        - Prepovedano parkiranje 	            :  520205
+        - Brez parkirnega listka 	            :  490746
+        - Dvojno parkiranje 	                :  322582
+    """
+
+
 def kazni_distrikt():
-    """ Demografika NYC: https://en.wikipedia.org/wiki/Demographics_of_New_York_City
+    """
+    Demografika NYC: https://en.wikipedia.org/wiki/Demographics_of_New_York_City
     - Ni tocnih podatkov za vsako leto, vzamem avg 2010 in 2019
-
-    - Staten Island:
-    # 2010 - 468,730
-    # 2019 - 476,143
-
-    - Bronx:
-    # 2010 - 1,385,108
-    # 2019 - 1,418,207
-
-    - Queens:
-    # 2010 - 2,230,722
-    # 2019 - 2,253,858
-
-    - Brooklyn:
-    # 2010 - 2,504,700
-    # 2019 - 2,559,903
-
-    - Manhattan:
-    # 2010 - 1,585,873
-    # 2019 - 1,628,706  """
+    """
 
     """ funkcije za izracun kazni v distriktih """
     # streets = dataset[(dataset['Issue Date'] > '2016-01-01 00:30:00')&(dataset['Issue Date'] < '2016-12-31 00:30:00')]
@@ -353,9 +430,9 @@ def kazni_distrikt():
 
     kazni_pop = []
 
-    for kazni in [kazni_2014, kazni_2015, kazni_2016]:
+    for kazni_l in [kazni_2014, kazni_2015, kazni_2016]:
         kazni_leto = []
-        for ime, kazni, pop in zip(districts, kazni, pop_district):
+        for ime, kazni, pop in zip(districts, kazni_l, pop_district):
             kazni_leto.append(kazni/pop)
         kazni_pop.append(kazni_leto)
 
@@ -374,64 +451,3 @@ def kazni_distrikt():
 
 
 main()
-""" 2014 <- file_2014
-#       BRONX           504189
-#       BROOKLYN        1016539
-#       MANHATTAN       1846962
-#       QUEENS          953598
-#       STATEN ISLAND   59714
-"""
-"""     2014 <- file_2015
-#       BRONX           580031
-#       BROOKLYN        1158171
-#       MANHATTAN       1975193
-#       QUEENS          1024853
-#       STATEN ISLAND   62429
-"""
-"""     2015 <- file_2015
-#       BRONX           602852
-#       BROOKLYN        1236619
-#       MANHATTAN       2133928
-#       QUEENS          1139422
-#       STATEN ISLAND   51856
-"""
-"""
-#   2015 <- file_2016
-#       BRONX           582918
-#       BROOKLYN        1190294
-#       MANHATTAN       1853098
-#       QUEENS          1009489
-#       STATEN ISLAND   53971
-"""
-
-"""
-#   2016 <- file_2016
-#       BRONX           495769
-#       BROOKLYN        1088374
-#       MANHATTAN       1694160
-#       QUEENS          886512
-#       STATEN ISLAND   50195
-"""
-
-"""
-Violation County
-
-BX        495769
-
-K        1006044 + 82330
-
-NY       1684424 + 9736
-
-Q         825206 + 61306
-
-ST         10401 + 39794
-"""
-
-"""
-#   2016 <- file_2017
-#       BRONX           672460
-#       BROOKLYN        1589315
-#       MANHATTAN       1693039
-#       QUEENS          1261145
-#       STATEN ISLAND   130140
-"""
