@@ -445,7 +445,7 @@ def kazni_po_urah():
 
     for i, cas in [(x, str(y)) for x, y in zip(dataset.index, dataset['Violation Time'])]:
         #preverimo točnost podatkov, odstranimo napačne
-        if cas != "nan" and "+" not in cas and len(cas) == 5:
+        if cas != "nan" and cas[0:4].isdigit() and len(cas) == 5:
             #dodamo M (format je npr. 0212A, pandas sprejema na koncu AM/PM)
             cas += "M"
             #print(cas)
