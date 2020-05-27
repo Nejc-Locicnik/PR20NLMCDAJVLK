@@ -4,6 +4,7 @@ import pandas as pd
 import geoplot as gplt
 import geopandas as gpd
 import matplotlib.pyplot as plt
+from geopy.geocoders import Nominatim
 from pandas.plotting import register_matplotlib_converters
 register_matplotlib_converters()
 
@@ -50,6 +51,7 @@ def main():
     kazni_leto_na_prebivalca()
     kazni_distrikt()
 
+    # long_lat_to_csv(dataset, 'test.csv')
 
 def beri_dataset(filename):
     """ BRANJE IN PARSANJE DATUMOV V DATETIME: """
@@ -75,6 +77,37 @@ def beri_dataset(filename):
 
 dataset = beri_dataset(file_2016_small)
 
+def long_lat_to_csv(dataset, output_file):
+    """ DODA LONGITUDE IN LATITUDE DATASETU TER EXPORTA V NOV CSV """
+    
+    print("function is on")
+    # privzeta vrednost:
+    dataset['longitude'] = None
+    dataset['latitude'] = None
+    geolocator = Nominatim(user_agent="test")
+    longlat  = dict()
+    area = "New York City, USA"
+    for i, row in dataset.iterrows():
+        if int(i) % 10 == 0:
+            print('vrstica:', i)
+        address = row['Street Name']
+        try:
+            # če je naslov že v slovarju:
+            long, lat = longlat[address]
+            dataset.at[i, 'longitude'] = long
+            dataset.at[i, 'latitude'] = lat
+        except:
+            # če address še ni v slovarju:
+            try:
+                # z geolocatorjem dobi long in lat in naslov doda v slovar
+                loc = geolocator.geocode(address + ',' + area)
+                longlat[address] = [loc.longitude, loc.latitude]
+            except:
+                # da funkciji ni potrebno večkrat preverjat naslovou, ki vrnejo None
+                longlat[address] = None
+    
+    out = './podatki/' + output_file
+    dataset.to_csv(out, index=False)
 
 def kazni_datum_group_teden():
     """ GRAF ŠTEVILA KAZNI PO DATUMIH: """
