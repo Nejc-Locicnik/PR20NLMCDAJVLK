@@ -45,13 +45,17 @@ Porazdelitev firm avtomobilov tudi ni preveč presenetljiva, vrh in skoraj polov
 
 ![slika](slike/firma_avta_porazdelitev.png)
 
-![slika](slike/stevilo_kazni_na_povp_preb.png)
+Pričakovali smo kak bolj očiten vzorec, amapak edino kar je razvidno je bistveno manjše število kazni okoli božica/novega leta.
 
 ![slika](slike/kazni_cas_2014.png)
 
-// od jureta
+Pri analizi kazni posameznih okrožij New York City od 2014 do 2016 smo ugotovili, da so med njimi kar velika nihanja. Brooklyn, Queens in Bronx imajo dokaj primerljivo število kazni na prebivalca, letno nihajo nekje med 0.4 in 0.55 na prebivalca. Staten Island in Manhattan pa kar opazno odstopata. Staten Island ima najmanj kazni, letno le do 0.2 na prebivalca , Manhattan pa daleč največ, kar od 1 do 1.2 na prebivalca.
 
-// barplot tipa kazni po letih
+![slika](slike/kazni_na_preb.png)
+
+Izračunali smo tudi najpogostejše kazni posameznega okrožja. Kar v treh je prejetih največ kazni zaradi prepovedanega parkiranja: v Brooklynu, Manhattanu in Bronxu. Pri tem je v Brooklynu in Bronxu specifično prepoved parkiranja v urah čiščenja cest. V drugih dveh okrožjih, Staten Islandu in Queensu, pa je najpogostejša kazen zaradi prehitre vožnje v šolski coni.
+
+![slika](slike/kazni_dist.png)
 
 ### Vizualizacije zemljevida <a class="anchor" id="map_viz"></a>
 __________________
@@ -83,8 +87,3 @@ Manjši problem smo imeli pri nejasnih vrednostih, tipkarskih napak ali celo nap
 Precej nadležna je tudi časovna porazdelitev podatkov na "fiscal" (davčno??) leto, tako da so podatki enega leta namesto od zacetka janurja do konca decembra porazdeljeni od zacetka junija do konca julija.
 
 Sama prednost velike množice podatkov je žal tudi velik problem, saj imamo težave pri poganjanju kode na celotni množici. Velik del atributov je praznih, tako da bomo poskusili te odstraniti. Samih primerov kazni nočemo odstranjevati, saj bi s tem zabrisali kakšne, morda prej bolj očitne vzorce.
-
-
-### Končni cilji
-___________________
-Prvi cilj je čim bolje podatke predstaviti že z samo vizualizacijo (npr. izris heatmapa kazni in primerjava po demografiji ali dohodku ulic). Drugi pa bi bil neke vrste sistem, ki nam glede na našo lokacijo (ulico) priporoči kje lahko v bližini "ilegalno" parkiramo z najmanjšo verjetnostjo kazni.
