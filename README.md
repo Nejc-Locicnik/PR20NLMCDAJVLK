@@ -11,6 +11,10 @@ ____________
 * Jure Vukina
 * Luka Kalezić
 
+## TOC:
+* [First Bullet Header](#first-bullet)
+* [Second Bullet Header](#second-bullet)
+
 ### Izbor in oblika podatkov:
 ____________
 Podatke smo pridobili iz: https://www.kaggle.com/new-york-city/nyc-parking-tickets#Parking_Violations_Issued_-_Fiscal_Year_2017.csv
@@ -48,6 +52,14 @@ Manjši problem smo imeli pri nejasnih vrednostih, tipkarskih napak ali celo nap
 Precej nadležna je tudi časovna porazdelitev podatkov na "fiscal" (davčno??) leto, tako da so podatki enega leta namesto od zacetka janurja do konca decembra porazdeljeni od zacetka junija do konca julija.
 
 Sama prednost velike množice podatkov je žal tudi velik problem, saj imamo težave pri poganjanju kode na celotni množici. Velik del atributov je praznih, tako da bomo poskusili te odstraniti. Samih primerov kazni nočemo odstranjevati, saj bi s tem zabrisali kakšne, morda prej bolj očitne vzorce.
+
+## First Bullet Header <a class="anchor" id="first-bullet"></a>
+
+code blocks...
+
+## Second Bullet Header <a class="anchor" id="second-bullet"></a>
+
+code blocks..
 
 ### Končni cilji
 ___________________
