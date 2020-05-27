@@ -77,7 +77,7 @@ def beri_dataset(filename):
     return dataset
 
 
-dataset = beri_dataset(file_2014)
+dataset = beri_dataset(file_2014_small)
 
 def priporocilni_sistem():
     """ PRIPOROČI NAJBOLJŠO LOKACIJO ZA ILEGALNO PARKIRANJE V BLIŽINI """
