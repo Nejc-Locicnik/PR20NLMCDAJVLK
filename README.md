@@ -11,11 +11,17 @@ ____________
 * Jure Vukina
 * Luka Kalezić
 
-## TOC:
-* [First Bullet Header](#first-bullet)
-* [Second Bullet Header](#second-bullet)
+### Kazalo
+* [Uvod](#uvod)
+* [Izbor in oblika podatkov](#izbor_oblika_pod)
+* [Osnovne vizualizacije](#osnovne_viz)
+* [Vizualizacije zemljevida](#map_viz)
+* [Priporočilni sistem](#prip_sistem)
+* [Problemi](#problemi)
 
-### Izbor in oblika podatkov:
+### Uvod <a class="anchor" id="uvod"></a>
+
+### Izbor in oblika podatkov <a class="anchor" id="izbor_oblika_pod"></a>
 ____________
 Podatke smo pridobili iz: https://www.kaggle.com/new-york-city/nyc-parking-tickets#Parking_Violations_Issued_-_Fiscal_Year_2017.csv
 
@@ -29,7 +35,7 @@ Kot osvnovi nabor podatkov smo izbrali ogromno podatkovno bazo parkirnih kazni v
 
 Skupaj predstavljajo do 51 atributov (odvisno od leta). Našo osnovo bomo po potrebi tudi dopolnjevali s pomožnimi podatki za normalizacijo ali primerjavo.
 
-### Osnovno o podatkih
+### Osnovne vizualizacije
 _______________________
 Za začetek smo za boljše razumevanje podatkov in kaj vse lahko z njimi naredimo vizualizirali nekaj osnovnih porazdalitev.
 
@@ -43,9 +49,21 @@ Za začetek smo za boljše razumevanje podatkov in kaj vse lahko z njimi naredim
 
 ![slika](slike/kazni_cas_2014.png)
 
-![test](slike/kazni_skozi_leta.gif)
+### Vizualizacije zemljevida <a class="anchor" id="map_viz"></a>
 
-### Problemi do zdaj
+![gif](slike/kazni_skozi_leta.gif =250x)
+
+![slika](slike/heatmap.png =250x100)
+
+### Priporočilni sistem <a class="anchor" id="prip_sistem"></a>
+
+Za priporočilni sistem smo se zanašali na koordinate (latitude, longitude), tako da nam ni preostalo druga kot uporaba koordinat, katere nam je uspelo dekodirati iz naslvov v podatkih (uporabljeni sicer za heatmap zgoraj). Ce jih se enkrat vizualiziramo zgledajo takole:
+
+![slika](slike/base_priporocilo.PNG)
+
+![slika](slike/kvadratki.PNG =250x250)
+
+### Problemi <a class="anchor" id="problemi"></a>
 __________________
 Manjši problem smo imeli pri nejasnih vrednostih, tipkarskih napak ali celo napačnih (datum) pri določenih atributih, kar smo k sreči lahko zaradi same velikosti podatkov (miljone primerov) ignorirali (cel primer).
 
@@ -53,13 +71,6 @@ Precej nadležna je tudi časovna porazdelitev podatkov na "fiscal" (davčno??) 
 
 Sama prednost velike množice podatkov je žal tudi velik problem, saj imamo težave pri poganjanju kode na celotni množici. Velik del atributov je praznih, tako da bomo poskusili te odstraniti. Samih primerov kazni nočemo odstranjevati, saj bi s tem zabrisali kakšne, morda prej bolj očitne vzorce.
 
-## First Bullet Header <a class="anchor" id="first-bullet"></a>
-
-code blocks...
-
-## Second Bullet Header <a class="anchor" id="second-bullet"></a>
-
-code blocks..
 
 ### Končni cilji
 ___________________
