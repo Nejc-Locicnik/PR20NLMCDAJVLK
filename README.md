@@ -82,8 +82,6 @@ Priporočilni sistem deluje tako, da uporabnik vnese naslov trenutne pozicije (l
 
 ### Problemi <a class="anchor" id="problemi"></a>
 __________________
-Manjši problem smo imeli pri nejasnih vrednostih, tipkarskih napak ali celo napačnih (datum) pri določenih atributih, kar smo k sreči lahko zaradi same velikosti podatkov (miljone primerov) ignorirali (cel primer).
+Sama velikost podatkovne baze je bila precej nadleža. Branje smo morali optimizirati z branjem po delih ali branjem samo določenih atributov. Sama baza pa je bila razdeljena na štiri davčna leta, tako da če smo želeli vizualizirati podatke čez vsa 4 leta, smo jih morali poganjati posebaj in nato rezultate lepiti skupaj.
 
-Precej nadležna je tudi časovna porazdelitev podatkov na "fiscal" (davčno??) leto, tako da so podatki enega leta namesto od zacetka janurja do konca decembra porazdeljeni od zacetka junija do konca julija.
-
-Sama prednost velike množice podatkov je žal tudi velik problem, saj imamo težave pri poganjanju kode na celotni množici. Velik del atributov je praznih, tako da bomo poskusili te odstraniti. Samih primerov kazni nočemo odstranjevati, saj bi s tem zabrisali kakšne, morda prej bolj očitne vzorce.
+Drug del naloge se nanaša predvsem na lokacijo. Na začetku smo bili mnenja, da bomo naslove preprosto prevedli v koordinate, vendar se nismo zavedali kako časovno potratno je to lahko. Geolocator storitev, ki smo uporabljali ima omejitve koliko prošnj lahko pošljemo v sekundo in če to poskusiš pohitriti (npr. z multiprocesiranjem) ti omejijo hitrost ali pa celo IP-bannajo. Plus je pa ša sama verjetnost uspešnega (in pravilnega) odgovora okoli 70%.
