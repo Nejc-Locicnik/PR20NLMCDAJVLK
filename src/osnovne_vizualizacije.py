@@ -441,36 +441,51 @@ def kazni_distrikt():
     plt.show()
 
 def kazni_po_urah():
-    violation_time = pd.DataFrame(columns=['time', 'i'])
+    dic = {}
 
-    for i, cas in [(x, str(y)) for x, y in zip(dataset.index, dataset['Violation Time'])]:
-        #preverimo točnost podatkov, odstranimo napačne
-        if cas != "nan" and cas[0:4].isdigit() and len(cas) == 5:
-            #dodamo M (format je npr. 0212A, pandas sprejema na koncu AM/PM)
+    #print("length: ", len(dataset))
+
+    for i, vrst in dataset.iterrows():
+        cas = vrst["Violation Time"]
+        # print(cas)
+        if i % 10000 == 0:
+            print(i)
+        # preverimo točnost podatkov, odstranimo napačne
+        if not pd.isnull(cas) and cas[0:4].isdigit() and len(cas) == 5:
+            # dodamo M (format je npr. 0212A, pandas sprejema na koncu AM/PM)
             cas += "M"
-            #print(cas)
+            # print(cas)
             if int(cas[0:2]) <= 12 and int(cas[2:4]) <= 59:
                 if cas[0:2] == "00":
                     cas = "12" + cas[2::]
-                violation_time = violation_time.append(
-                    {'time': pd.to_datetime("01-01-2000 " + str(dt.datetime.strptime(cas, '%I%M%p').time())), 'i': i},
-                    ignore_index=True)
+                dic[i] = pd.to_datetime("01-01-2000 " + str(dt.datetime.strptime(cas, '%I%M%p').time()))
 
-    #spremenimo podatkovni tip stolpca v time in ga nastavimo kot indeks
+    violation_time = pd.DataFrame.from_dict(dic, orient='index', columns=['time']).reset_index()
+
+    # spremenimo podatkovni tip stolpca v time in ga nastavimo kot indeks
     violation_time = violation_time.set_index(["time"])
-    violation_time.index = pd.to_datetime(violation_time.index, unit='s')
 
-    #print(violation_time.to_string())
+    print(violation_time)
 
-    #naredimo intervale po 60 minut iz indeksov (časa)
+    #print("indeks ok")
+
+    # naredimo intervale po 60 minut iz indeksov (časa)
     grp = violation_time.resample('60min', base=0, label='right').count().reset_index()
 
-    #damo v string in izrišemo na grafu
+    #print("intervali ok")
+
+    # damo v string in izrišemo na grafu
     grp['time'] = grp['time'].astype(str).str.slice(start=11)
-    grp.plot(kind="barh", x="time", y="i", legend=False)
+
+    #print("string ok")
+
+    grp.reset_index().plot(kind="barh", x="time", y="index", legend=False)
     plt.title("Absolutno število kazni glede na uro")
     plt.xlabel('Število kazni')
     plt.ylabel('Ura (zg. meja, interval 60 min)')
+
+    #print("plot ok")
+
     plt.show()
 
 
