@@ -43,7 +43,7 @@ Kot pričakovano je med delovnimi dnevi porazdelitev kazni skoraj enakakomerna, 
 
 Tudi porazdelitev po urah je pričakovana, velika večina je med delovnimi urami (od 8. do 17. ure), presenetljivo pa je tudi število med 22. in 5. uro.
 
-![slika](slike/ure.png)
+![slika](slike/ure_2014.png)
 
 Porazdelitev firm avtomobilov tudi ni preveč presenetljiva, vrh in skoraj polovico seznama zasedajo ameriške firme, ostalo si pa delijo popularne evropejske in azijske firme.
 
